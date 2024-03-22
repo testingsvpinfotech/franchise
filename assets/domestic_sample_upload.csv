@@ -1,0 +1,2 @@
+Customerid,Booking date,Courier,FWN,Mode,"product(Non-Doc-1,Doc=0)",desc,inv no,inv value,consignee name,company name,address,pin,nop,aw,l,b,h,cw,pod_no,Sender_pincode
+ECS0002,26-06-2021,TRACKON,OMD0021,Express,1,Test entry,101,10000,Test name,test company,test address,110024,1,68,1,1,1,1,1234,302021

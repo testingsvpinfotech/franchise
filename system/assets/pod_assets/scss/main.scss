@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+html,
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+body {
+  color: #535c68;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  padding-top: 100px;
+  background-color: #130f40;
+}
+section,
+header,
+footer {
+  width: 100%;
+  float: left;
+  clear: both;
+}
+.container{
+  padding:50px;
+  max-width: 1240px;
+  background-color: #ffffff;
+}
+.pd0{
+  padding: 0;
+}
+.table{
+  margin-bottom: 0;
+}
+.black{
+color: #000000;
+font-weight: 500;
+}
+.num{
+  font-size: 30px;
+    font-weight: 300;
+    color: #909090;
+    text-align: center;
+    margin-top: 10px;
+}
+small{
+  display: block;
+  line-height: 15px;
+  font-size: 10px;
+  text-transform: capitalize;
+}
+.blank-box{
+   padding: 40px 0px !important;
+}
+.text-center{
+  color: #000000;
+  font-weight: 500;
+}
+.table td, .table th {
+  padding: .5rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+}
+
+.vc{
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  padding: 5px 0px;
+  margin-top: 75px;
+}
+.table-list{
+  margin-bottom: 100px;
+  .table-one{
+    thead{
+      tr{
+        th{
+          padding: 30px 15px;
+        }
+      }
+    }
+    .logo{
+      width: 200px;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 20px;
+    }
+    h4{
+      font-size: 20px;
+      color: #000;
+      font-weight: 600;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    small{
+      text-align: center;
+      font-size: 12px;
+      display: block;
+    }
+    .pd{
+      padding: 0 !important;
+    }
+    .left-top{
+      display: inline-block;
+      border-right: 1px solid #dee2e6;
+      border-bottom: 1px solid #dee2e6;
+      padding:5px 20px;
+      color: #000000;
+      font-weight: 500;
+      margin-bottom: 122px;
+    }
+  }
+}

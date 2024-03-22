@@ -1,0 +1,20 @@
+SrNo.,Date,ABW,Network,Type,Mode,NOP,ForwordingNo,Destination,Customer,Receiver,Doc/Non-doc,Weight,"Bill Type",Status
+1,20-10-2021,1234,All,Domestic,Air,1,,MUMBAI,"BLUE LINES LOGISTICS",ABC,"Non Document",10,Credit,Pending
+2,20-10-2021,BKX100022,Delhivery,Domestic,Air,1,,JAIPUR,"BLUE LINES LOGISTICS",test,"Non Document",1,Credit,Pending
+3,20-10-2021,BKX100023,Delhivery,Domestic,Air,1,11051510007206,JAIPUR,"BLUE LINES LOGISTICS",test,"Non Document",1,Credit,Pending
+4,20-10-2021,BKX100024,Delhivery,Domestic,Air,1,11051510007206,JAIPUR,"BLUE LINES LOGISTICS",test,"Non Document",1,Credit,Pending
+5,21-10-2021,BKX100046,Delhivery,Domestic,Surface,1,,MUMBAI,"BLUE LINES LOGISTICS",bharat,"Non Document",10,Credit,Pending
+6,21-10-2021,BKX100050,Delhivery,Domestic,Air,1,BKX100050,MUMBAI,"BLUE LINES LOGISTICS",test1,"Non Document",1,Credit,Pending
+7,21-10-2021,BKX100051,Delhivery,Domestic,Air,1,11051510011233,MUMBAI,"BLUE LINES LOGISTICS",test1,"Non Document",1,Credit,Pending
+8,21-10-2021,BKX100053,Delhivery,Domestic,Surface,1,11051510011244,MUMBAI,"BLUE LINES LOGISTICS",ABCD,"Non Document",100,Credit,Pending
+9,25-10-2021,11013190,"BK XPRESS CARGO PVT LTD",Domestic,Surface,1,,MUMBAI,"BLUE LINES LOGISTICS","ANIRUDHA DESAI ","Non Document",75,Credit,"Shipment Booked"
+10,29-10-2021,11020858,"BK XPRESS CARGO PVT LTD",Domestic,Surface,7,,AHMEDABAD,"BLUE LINES LOGISTICS",MANNA,"Non Document",133,Credit,In-Scan
+11,19-11-2021,12121,"BK XPRESS CARGO PVT LTD",Domestic,Surface,1,,"NEW DELHI","BLUE LINES LOGISTICS",ABC,"Non Document",1,Credit,recieved
+12,04-12-2021,987654,"BK XPRESS CARGO PVT LTD",Domestic,Surface,1,,"NEW DELHI","BLUE LINES LOGISTICS",abc,"Non Document",10,Credit,Delivered
+13,11-12-2021,11012789,"BK XPRESS CARGO PVT LTD",Domestic,Surface,1,,KOLKATA,"BLUE LINES LOGISTICS","TAPAN KUMAR","Non Document",16,Credit,Delivered
+14,11-12-2021,11013096,"BK XPRESS CARGO PVT LTD",Domestic,Surface,3,,CHENNAI,"BLUE LINES LOGISTICS",DECIBEL,"Non Document",40,Credit,Delivered
+15,11-12-2021,11012788,"BK XPRESS CARGO PVT LTD",Domestic,Surface,3,,CHANDIGARH,"BLUE LINES LOGISTICS","MR KARAN LALACHAND","Non Document",46,Credit,Delivered
+16,03-01-2022,8520,"BK XPRESS CARGO PVT LTD",Domestic,Surface,1,,CHENNAI,"BLUE LINES LOGISTICS",abc,"Non Document",1,Credit,Delivered
+17,09-01-2022,11,"BK XPRESS CARGO PVT LTD",Domestic,Surface,1,,MUMBAI,"BLUE LINES LOGISTICS",ABC,"Non Document",101,Credit,"Out For Delivery"
+18,14-01-2022,789456,"BK XPRESS CARGO PVT LTD",Domestic,Surface,1,,"NEW DELHI","BLUE LINES LOGISTICS",abc,"Non Document",1,Credit,In-Scan
+19,24-01-2022,11016468,"BK XPRESS CARGO PVT LTD",Domestic,Surface,4,,"NEW DELHI","BLUE LINES LOGISTICS","TOUCH LITE AUTOMATION","Non Document",95,Credit,Delivered

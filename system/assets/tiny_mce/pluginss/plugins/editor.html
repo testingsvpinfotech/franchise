@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="js/tinymce/jquery.tinymce.min.js"></script>
+	<script type="text/javascript" src="js/tinymce/tinymce.min.js"></script>
+  <script type="text/javascript" src="kcfinder/browse.php"></script>
+ <script type="text/javascript">
+    tinymce.init({
+      selector: '#myTextarea',
+      theme: 'modern',
+      width: '100%',
+      height: 500,
+      plugins: [
+        'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
+    'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+    'save table contextmenu directionality emoticons template paste textcolor'
+      ],
+
+      content_css: 'css/content.css',
+      toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons'
+
+      //  KCFinder Plugin
+    file_browser_callback: function(field, url, type, win) {
+        tinyMCE.activeEditor.windowManager.open({
+            file: 'kcfinder/browse.php?opener=tinymce4&field=' + field + '&type=' + type,
+            title: 'KCFinder',
+            width: 700,
+            height: 500,
+            inline: true,
+            close_previous: false
+        }, {
+            window: win,
+            input: field
+        });
+        return false;
+    }
+  //  End KCFinder Plugin
+
+    });
+</script>
+</head>
+<body>
+	<textarea id="myTextarea"></textarea>
+
+</body>
+</html>

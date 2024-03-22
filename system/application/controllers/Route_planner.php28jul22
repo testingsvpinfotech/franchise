@@ -1,0 +1,87 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Route_planner extends CI_Controller {
+
+	var $data 			= array();
+	function __construct()
+	{
+		 parent:: __construct();
+		 $this->load->model('basic_operation_m');
+		if($this->session->userdata('userId') == '')
+		{
+			redirect('admin');
+		}
+	}
+	
+	
+	###################### View All Airlines Start ########################
+	
+	public function routelist()
+	{  
+	   
+		// $data 							= $this->data;
+		// $user_id						= $this->session->userdata("userId");
+		//$data['route']			= $this->basic_operation_m->get_query_result("select * from tbl_route_planner");
+
+        $this->load->view('admin/route_planner/routelist');
+      
+	}
+	public function add_route()
+	{  
+	    if($this->input->post()){
+            $value = array();
+            $value['route_name'] = $this->input->post('route_name');
+            $value['city_list'] = $this->input->post('city');
+        //    // $value['city_list'] = explode(" ",$v);
+        //     print_r( $value);die();
+        }
+		
+		$data['city']  = $this->db->query('select city from city')->result_array();
+        $this->load->view('admin/route_planner/add_route',$data);
+      
+	}
+	public function report_branch()
+	{  
+        
+		$data['city']  = $this->db->query('select city from city')->result_array();
+        $this->load->view('admin/route_planner/report_branch',$data);
+      
+	}
+	public function todaycoll()
+	{  
+        
+		//$data['city']  = $this->db->query('select city from city')->result_array();
+        $this->load->view('admin/route_planner/collection',$data);
+      
+	}
+	public function pettycash()
+	{  
+        
+		//$data['city']  = $this->db->query('select city from city')->result_array();
+        $this->load->view('admin/route_planner/pettycash',$data);
+      
+	}
+	public function duereport()
+	{  
+        
+		//$data['city']  = $this->db->query('select city from city')->result_array();
+        $this->load->view('admin/route_planner/duereport',$data);
+      
+	}
+	public function branchcollection()
+	{  
+        
+		//$data['city']  = $this->db->query('select city from city')->result_array();
+        $this->load->view('admin/route_planner/branchcollection',$data);
+      
+	}
+	
+	
+	
+	###################### View All Airlines End ########################	
+	
+	
+   
+}
+?>
