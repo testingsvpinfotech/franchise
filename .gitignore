@@ -1,2 +1,4 @@
 # admin folder only
 admin
+application/logs/
+system/
