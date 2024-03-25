@@ -15,6 +15,7 @@
         <!-- END Template CSS-->
 
         <!-- START: Page CSS-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css" integrity="sha512-IXuoq1aFd2wXs4NqGskwX2Vb+I8UJ+tGJEu/Dc0zwLNKeQ7CW3Sr6v0yU3z5OQWe3eScVIkER4J9L7byrgR/fA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel="stylesheet"  href="<?php echo base_url();?>assets/franchise_assets/dist/vendors/chartjs/Chart.min.css">
         <!-- END: Page CSS-->
 
@@ -31,6 +32,7 @@
         <!-- START: Custom CSS-->
         <link rel="stylesheet" href="<?php echo base_url();?>assets/franchise_assets/dist/css/main.css">
         <script src="https://psa.atomtech.in/staticdata/ots/js/atomcheckout.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js" integrity="sha512-JnjG+Wt53GspUQXQhc+c4j8SBERsgJAoHeehagKHlxQN+MtCCmFDghX9/AcbkkNRZptyZU4zC8utK59M5L45Iw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <!-- END: Custom CSS-->
  
     </head>

@@ -378,14 +378,12 @@ $("#desabledBTN").click(function() {
 	$("#valumetric_chageable").blur(function () {
 		getRate(0);
 	});
+
+
+
+    // walking customer and franchise prepaid rate
 	function getRate(update) {
-		// alert('chargable_weight');
-		if ($('#is_appointment').is(':checked')) {
-			var is_appointment = 1;
-		}
-		else {
-			var is_appointment = 0;
-		}
+		
 		var customer_id = $('#customer_account_id').val();
 		var c_courier_id = $('#courier_company').val();
 		var mode_id = $('#mode_dispatch').val();
@@ -400,44 +398,94 @@ $("#desabledBTN").click(function() {
 		var dispatch_details = $('#dispatch_details').val();
 		var region_id = $('#region_id').val();
 		var invoice_value = parseFloat(($('#invoice_value').val() != '') ? $('#invoice_value').val() : 0);
-
 		var chargable_weight = parseFloat($('#chargable_weight').val()) > 0 ? $('#chargable_weight').val() : 0;
 
-		if (mode_id != '') {
-			$.ajax({
-				type: 'POST',
-				url: base_url + 'Franchise_manager/add_new_rate_domestic',
-				data: 'customer_id=' + customer_id + '&c_courier_id=' + c_courier_id + '&mode_id=' + mode_id + '&state=' + state + '&city=' + city + '&chargable_weight=' + chargable_weight + '&receiver_zone_id=' + receiver_zone_id + '&receiver_gstno=' + receiver_gstno + '&booking_date=' + booking_date + '&invoice_value=' + invoice_value + '&dispatch_details=' + dispatch_details + '&sender_state=' + sender_state + '&sender_city=' + sender_city + '&is_appointment=' + is_appointment + "&region_id=" + region_id + "&doc_type=" + doc_type,
+		var franchise_type = $('#franchise_type').val();
+		var bnf_customer = $('.bnf_customer').val();
 
-				dataType: "json",
-				success: function (data) {
-					$('#frieht').val(data.frieht);
-					$('#transportation_charges').val(0);
-					$('#pickup_charges').val(0);
-					$('#delivery_charges').val(0);
-					$('#insurance_charges').val(0);
-					$('#courier_charges').val(data.cod);
-					$('#other_charges').val(data.to_pay_charges);
-					$('#amount').val(data.amount);
-					$('#fuel_charges').val(data.final_fuel_charges);
-					$('#sub_total').val(data.sub_total);
-					$('#cgst').val(data.cgst);
-					$('#sgst').val(data.sgst);
-					$('#igst').val(data.igst);
-					$('#awb_charges').val(data.docket_charge);
-					$('#fov_charges').val(data.fov);
-					$('#appt_charges').val(data.appt_charges);
-					$('#grand_total').val(data.grand_total);
-					$('#cft').val(data.cft);
-					$('#delivery_date').val(data.tat_date);
-					// shipmentGST_calcu();
+		if(franchise_type== 2){
+			if (mode_id != '') {
+				$.ajax({
+					type: 'POST',
+					url: base_url + 'Franchise_manager/add_new_rate_domestic',
+					data: 'customer_id=' + customer_id + '&c_courier_id=' + c_courier_id + '&mode_id=' + mode_id + '&state=' + state + '&city=' + city + '&chargable_weight=' + chargable_weight + '&receiver_zone_id=' + receiver_zone_id + '&receiver_gstno=' + receiver_gstno + '&booking_date=' + booking_date + '&invoice_value=' + invoice_value + '&dispatch_details=' + dispatch_details + '&sender_state=' + sender_state + '&sender_city=' + sender_city + '&is_appointment=' + is_appointment + "&region_id=" + region_id + "&doc_type=" + doc_type,
+					dataType: "json",
+					success: function (data) {
+						$('#frieht').val(data.frieht);
+						$('#transportation_charges').val(0);
+						$('#pickup_charges').val(0);
+						$('#delivery_charges').val(0);
+						$('#insurance_charges').val(0);
+						$('#courier_charges').val(data.cod);
+						$('#other_charges').val(data.to_pay_charges);
+						$('#amount').val(data.amount);
+						$('#fuel_charges').val(data.final_fuel_charges);
+						$('#sub_total').val(data.sub_total);
+						$('#cgst').val(data.cgst);
+						$('#sgst').val(data.sgst);
+						$('#igst').val(data.igst);
+						$('#awb_charges').val(data.docket_charge);
+						$('#fov_charges').val(data.fov);
+						$('#appt_charges').val(data.appt_charges);
+						$('#grand_total').val(data.grand_total);
+						$('#cft').val(data.cft);
+						$('#delivery_date').val(data.tat_date);
+						// shipmentGST_calcu();
 
+					}
+				});
+			}
+			else {
+				$('#frieht').val();
+				alertify.alert("Shipment Mode Alert!","Please Select mode",
+				function () {
+					alertify.success('Ok');
+				});
+			}
+	    }else{
+			if (mode_id == '') {
+					$('#frieht').val();
+					alertify.alert("Shipment Mode Alert!","Please Select mode",
+					function () {
+						alertify.success('Ok');
+					});
+			}else{
+				if(bnf_customer=="" && $('#company_customer').is(":checked")){				
+					$.ajax({
+						type: 'POST',
+						url: base_url + 'Franchise_manager/add_new_rate_domestic',
+						data: 'customer_id=' + customer_id + '&c_courier_id=' + c_courier_id + '&mode_id=' + mode_id + '&state=' + state + '&city=' + city + '&chargable_weight=' + chargable_weight + '&receiver_zone_id=' + receiver_zone_id + '&receiver_gstno=' + receiver_gstno + '&booking_date=' + booking_date + '&invoice_value=' + invoice_value + '&dispatch_details=' + dispatch_details + '&sender_state=' + sender_state + '&sender_city=' + sender_city + "&region_id=" + region_id + "&doc_type=" + doc_type,
+						dataType: "json",
+						success: function (data) {
+							$('#frieht').val(data.frieht);
+							$('#transportation_charges').val(0);
+							$('#pickup_charges').val(0);
+							$('#delivery_charges').val(0);
+							$('#insurance_charges').val(0);
+							$('#courier_charges').val(data.cod);
+							$('#other_charges').val(data.to_pay_charges);
+							$('#amount').val(data.amount);
+							$('#fuel_charges').val(data.final_fuel_charges);
+							$('#sub_total').val(data.sub_total);
+							$('#cgst').val(data.cgst);
+							$('#sgst').val(data.sgst);
+							$('#igst').val(data.igst);
+							$('#awb_charges').val(data.docket_charge);
+							$('#fov_charges').val(data.fov);
+							$('#appt_charges').val(data.appt_charges);
+							$('#grand_total').val(data.grand_total);
+							$('#cft').val(data.cft);
+							$('#delivery_date').val(data.tat_date);
+						}
+					});
+			    }else{
+					alertify.alert("Shipment Rate Alert!","Customer Not Selected . <br>Please define customer franchise customer or BNF.",
+					function () {
+						alertify.success('Ok');
+					});
 				}
-			});
-		}
-		else {
-			$('#frieht').val();
-			alert('Please Select mode')
+			}
+			
 		}
 	}
 
@@ -1010,3 +1058,32 @@ function checkForTheCondition() {
 			});
 	}
 }
+
+// credit case walking customer or bnf customer blocking system  start
+// bnf customer 
+$('.bnf_customer').change(function(){
+   var bnf_cut = $(this).val();
+   if(bnf_cut!=''){
+	  $("#company_customer").prop("disabled", true);
+   }else
+   {
+	$('#sender_name').val('');
+	$('#sender_address').val('');
+	$('#sender_pincode').val('');
+	$('#sender_contactno').val('');
+	$('#sender_gstno').val('');
+	$('#sender_state').html('<option value="">Select State</option>');
+	$('#sender_city').html('<option value="">Select City</option>');
+	$("#company_customer").prop("disabled", false);
+   }
+});
+
+$('#company_customer').change(function(){
+   if($('#company_customer').is(":checked")){
+	  $(".bnf_customer").prop("disabled", true);
+   }else
+   {
+	$(".bnf_customer").prop("disabled", false);
+   }
+});
+// credit case walking customer or bnf customer blocking system  end

@@ -756,14 +756,8 @@ class Franchise_manager extends CI_Controller
 
 			$this->session->set_flashdata('notify', $msg);
 			$this->session->set_flashdata('class', $class);
-
-
 			redirect('franchise/shipment-list');
 		} else {
-
-
-
-
 			$data = array();
 
 			$result = $this->db->query('select max(booking_id) AS id from tbl_domestic_booking')->row();

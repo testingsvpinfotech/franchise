@@ -28,7 +28,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Shipment Info</h4>
-                              
+                               <input type="hidden" id="franchise_type" value="<?= $_SESSION['franchise_type'];?>">
                             </div>
                             <div class="card-content">
                                 <div class="card-body">
@@ -188,7 +188,7 @@
                                          <?php if($_SESSION['franchise_type']==1 OR $_SESSION['franchise_type']==3){ ?>
                                         <label class="col-sm-4 col-form-label">BNF Customer</label>
                                         <div class="col-sm-8" id="credit_div">
-                                            <select class="form-control" name="customer_account_id" id="customer_account_id">
+                                            <select class="form-control bnf_customer" name="customer_account_id" id="customer_account_id">
                                                 <option value="">Select Customer</option>
                                                 <?php
                                                 if (count($customers)) {
@@ -202,6 +202,10 @@
                                                 }
                                                 ?>
                                             </select>
+                                        </div>
+                                        <label class="col-sm-5 col-form-label" id="credit_div_label">Franchise Customer</label>
+                                        <div class="col-sm-7"> <br>
+                                            <input type="checkbox" name="company_customer" id="company_customer" value ='1'>
                                         </div>
                                         <?php } ?>
                                     </div>
@@ -364,10 +368,17 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 col-form-label">GST NO.</label>
                                         <div class="col-sm-8">
-                                            <input type="text" name="receiver_gstno" id="receiver_gstno" class="form-control">
+                                            <input type="text" name="receiver_gstno" id="receiver_gstno" maxlength="16" minlength="1" class="form-control">
                                         </div>
                                     </div>
-                                  
+                                    <?php if($_SESSION['franchise_type']==1 OR $_SESSION['franchise_type']==3){ ?>
+                                    <div class=" row">
+                                        <label class="col-sm-5 col-form-label" id="credit_div_label">Door Delivery</label>
+                                        <div class="col-sm-7"> <br>
+                                            <input type="checkbox" name="door_delivery_acces" id="door_delivery" value="1">
+                                        </div>
+                                    </div>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </div>
@@ -475,23 +486,44 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="form-group row">
-                                                <label class="col-sm-3 col-form-label">Freight</label>
+                                                <label class="col-sm-3 col-form-label">Freight Chg.</label>
                                                 <div class="col-sm-3">
                                                     <input type="number" min="1" name="frieht" class="form-control" value="" required  id="frieht" readonly />
                                                 </div>
-                                                <label class="col-sm-3 col-form-label">ODA Charge</label>
+                                                <label class="col-sm-3 col-form-label">ODA Chg.</label>
                                                 <div class="col-sm-3">
                                                     <input type="number" name="delivery_charges" class="form-control" value="0" id="delivery_charges" readonly>
                                                 </div>
                                                 
                                             </div>
+                                            <?php if($_SESSION['franchise_type']==1 OR $_SESSION['franchise_type']==3){ ?>
                                             <div class="form-group row">
-                                                
-                                                 <label class="col-sm-3 col-form-label">COD</label>
+                                                 <label class="col-sm-3 col-form-label">Booking Chg.</label>
+                                                <div class="col-sm-3">
+                                                    <input type="number" name="booking_charges" class="form-control" value="0" id="booking_charges" readonly>
+                                                </div>
+                                                 <label class="col-sm-3 col-form-label">Pickup Chg.</label>
+                                                <div class="col-sm-3">
+                                                    <input type="number" name="pickup_charges" class="form-control" value="0" id="pickup_charges" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">                                                
+                                                 <label class="col-sm-3 col-form-label">Delivery Chg.</label>
+                                                <div class="col-sm-3">
+                                                    <input type="number" name="delivery_charges" class="form-control" value="0" id="delivery_charges" readonly>
+                                                </div>
+                                                 <label class="col-sm-3 col-form-label">Door Delivery Chg.</label>
+                                                <div class="col-sm-3">
+                                                    <input type="number" name="door_delivery_charges" class="form-control" value="0" id="door_delivery_charges" readonly>
+                                                </div>
+                                            </div>
+                                            <?php } ?>
+                                            <div class="form-group row">                                                
+                                                 <label class="col-sm-3 col-form-label">COD Chg.</label>
                                                 <div class="col-sm-3">
                                                     <input type="number" name="courier_charges" class="form-control" value="0" id="courier_charges" readonly>
                                                 </div>
-                                                 <label class="col-sm-3 col-form-label">AWB Ch.</label>
+                                                 <label class="col-sm-3 col-form-label">AWB Chg.</label>
                                                 <div class="col-sm-3">
                                                     <input type="number" name="awb_charges" class="form-control" value="0" id="awb_charges" readonly>
                                                 </div>
@@ -499,11 +531,11 @@
                                          
                                             <div class="form-group row">
 
-                                                <label class="col-sm-3 col-form-label">Other Ch.</label>
+                                                <label class="col-sm-3 col-form-label">Other Chg.</label>
                                                 <div class="col-sm-3">
                                                     <input type="number" name="other_charges" class="form-control" value="0" id="other_charges" readonly>
                                                 </div>
-                                                <label class="col-sm-3 col-form-label">Fov Charges</label>
+                                                <label class="col-sm-3 col-form-label">Fov Chg.</label>
                                                 <div class="col-sm-3">
                                                     <input type="number"  class="form-control" name="fov_charges" id="fov_charges" value="0" readonly>
                                                 </div>
