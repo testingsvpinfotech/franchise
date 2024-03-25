@@ -52,29 +52,11 @@
             <div class="site-width">
                 <nav class="navbar navbar-expand-lg  p-0">
                     <div class="navbar-header  h-100 h4 mb-0 align-self-center logo-bar text-left">  
-                        <a href="{{route('dashboard')}}" class="horizontal-logo text-left">
+                        <a href="<?= base_url('franchise/dashboard'); ?>" class="horizontal-logo text-left">
                            <img src="<?php echo base_url();?>assets/franchise_assets/dist/images/Final Logo.png" style="width:100px;height:auto;">            
                         </a>                   
                     </div>
-                    <!--<div class="navbar-header h4 mb-0 text-center h-100 collapse-menu-bar">-->
-                    <!--    <a href="#" class="sidebarCollapse" id="collapse"><i class="icon-menu"></i></a>-->
-                    <!--</div>-->
-
-                    <!-- <form class="float-left d-none d-lg-block search-form">
-                       <div class="form-group mb-0 position-relative">
-                           <input type="text" class="form-control border-0 rounded bg-search pl-5" placeholder="Search anything...">
-                           <div class="btn-search position-absolute top-0">
-                               <a href="#"><i class="h6 icon-magnifier"></i></a>
-                           </div>
-                           <a href="#" class="position-absolute close-button mobilesearch d-lg-none" data-toggle="dropdown" aria-expanded="false"><i class="icon-close h5"></i>                              
-                           </a>
-
-                       </div>
-                    </form> -->
-                    <!-- <div>
-                    
-                    
-                    </div> -->
+                  
                     
                     <div class="navbar-right h-100">
                         
@@ -88,13 +70,19 @@
                         <a href="<?=base_url('assets/Franchise-Demo-Video/demo.mp4'); ?>" target="_blank" class="btn btn-sm btn-success text-white mr-1"><i class="mdi mdi-cube-send"></i> Franchise Demo</a>
 
                         <a href="<?= base_url('franchise/view-internal-status'); ?>" target="_blank" class="btn btn-sm btn-danger text-white mr-1"><i class="mdi mdi-cube-send"></i> Tracking</a>
+                        <?php if($_SESSION['franchise_type']==1){ 
+                             $value = $_SESSION['customer_id']; 
+                            $credit_limit = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
+                               ?>
+                         <li class="nav-item">
+                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" data-html="true" data-original-title="" title="">Credit Limit ₹<?=$credit_limit->credit_limit;?></button> <br>
+                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" data-html="true" data-original-title="" title="">Utilize  Amount₹<?=$credit_limit->credit_limit_utilize;?></button>
                         </li>
-                        <!-- <li class="nav-item">
-                        <a href="#" class="btn btn-sm btn-info text-white  mr-1"><i class="mdi mdi-download"></i>B2C Pincodes List</a>
-                        </li> -->
+                        <?php } ?>                       
+                        </li>
+                        <?php if($_SESSION['franchise_type']==2){ ?>
                          <li class="nav-item"> <?php $value = $_SESSION['customer_id']; 
                          $balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
-                         // echo $this->db->last_query();
                          ?>
                             <button class="btn btn-sm btn-light" data-toggle="tooltip" data-html="true" data-original-title="" title="">Balance ₹ <?= $balance->wallet; ?></button>
                             <?php  $customer_id = $_SESSION['customer_id'];        
@@ -103,10 +91,10 @@
                             { ?>
                             <a href="<?= base_url('atom_payment/Recharge_wallet/refresh_transcation');?>" title ="Faild Transaction Refresh" style="margin-top:2px;"><img src="<?= base_url('assets/update_icon.png');?>" width="40px"></a>
                             <?php } ?>
-                        </li>
-                         <li class="nav-item">
-                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" data-html="true" data-original-title="" title="">Current Limit ₹0</button>
-                        </li>
+                        </li> 
+                         <?php } ?>
+                          
+                       
                          <li class="nav-item ">
                             <button class="btn btn-sm btn-success" style="background:#12263f!important;border: 1px solid #12263f!important;" data-toggle="modal" data-target="#myModal"><i class="mdi mdi-flash"></i> Recharge</button>
                           
@@ -115,7 +103,7 @@
                             <li class="dropdown user-profile align-self-center d-inline-block">
                                 <a href="#" class="nav-link py-0" data-toggle="dropdown" aria-expanded="false"> 
                                     <div class="media">                                   
-                                        <img src="<?php echo base_url();?>assets/franchise_assets/dist/images/author.jpg" alt="" class="d-flex img-fluid rounded-circle" width="29">
+                                        <img src="<?php echo base_url();?>assets/franchise_assets/dist/images/usericon.png" alt="" class="d-flex img-fluid rounded-circle" width="29">
                                          <b style="color:black; margin-left:5px;">Branch <br> <?php echo $this->session->userdata('branch_name');?></b>
                                         <br>
                                     </div>

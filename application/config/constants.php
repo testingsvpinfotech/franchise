@@ -91,3 +91,10 @@ $data = [
     '3'=>'NSS'
 ];
 define('service_type', $data);
+
+$bill_type = [
+    '1'=>'Credit',
+    '2'=>'Prepaid',
+    // '3'=>'Both'
+];
+define('bill_type', $bill_type);

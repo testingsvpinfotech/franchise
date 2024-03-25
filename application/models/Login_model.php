@@ -30,7 +30,7 @@ class Login_model extends CI_Model {
 		$this->db->from('tbl_customers');
 		$this->db->where('email',$email);
 		$this->db->where_in('customer_type', ['1','2']);
-		$this->db->where('password',$password);
+		$this->db->where('password',md5($password));
 		$this->db->where('isdeleted',0);
 		
 		$query=$this->db->get();
@@ -42,6 +42,7 @@ class Login_model extends CI_Model {
 		    $customer_type = $query->row()->customer_type;
 			$customer_id = $query->row()->customer_id;
 			$branch_id = $query->row()->branch_id;
+			$bill_type = $query->row()->franchise_booking_type;
 			$branch = $this->db->query("select branch_name from tbl_branch where branch_id = '$branch_id'")->row();
 			$branch_name = $branch->branch_name;
 			$this->session->set_userdata("customer_name",$customer_name);
@@ -50,6 +51,7 @@ class Login_model extends CI_Model {
 			$this->session->set_userdata("customer_id",$customer_id);
 			$this->session->set_userdata("branch_name",$branch_name);
 			$this->session->set_userdata("branch_id",$branch_id);
+			$this->session->set_userdata("franchise_type",$bill_type);
 			return $query->result_array();
 		}	
 		else

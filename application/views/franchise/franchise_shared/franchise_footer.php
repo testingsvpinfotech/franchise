@@ -23,6 +23,7 @@
 
         <!-- START: APP JS-->
         <script src="<?php echo base_url();?>assets/franchise_assets/dist/js/app.js"></script>
+        <script src="<?php echo base_url();?>assets/franchise_assets/domestic_shipment_1.js"></script>
         <!-- END: APP JS-->
 
         <!-- START: Page Vendor JS-->

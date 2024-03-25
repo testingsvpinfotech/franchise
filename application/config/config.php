@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 
-  $config['base_url'] 	= 'https://alfauzanenterprises.net/';
+  $config['base_url'] 	= 'http://localhost/franchise/';
   // $config['base_url'] 	= 'http://13.233.69.242/';
   // $config['base_url'] 	= 'http://boxnfreight.co.in/';
 

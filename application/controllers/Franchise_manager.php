@@ -1,7 +1,5 @@
 <?php
 ini_set('display_errors', 1);
-
-
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Franchise_manager extends CI_Controller
@@ -72,6 +70,39 @@ class Franchise_manager extends CI_Controller
 		$this->load->view('franchise/dashboard', $data);
 	}
 
+	public function available_cft() {
+		$courier_id = $this->input->post('courier_id');
+		$booking_date = trim($this->input->post('booking_date'));
+		$customer_id = trim($this->input->post('customer_id'));
+
+		if (!empty($booking_date)) {
+			$current_date = date("Y-m-d",strtotime($booking_date));
+		}else{
+			$current_date = date('Y-m-d');
+		}
+		
+		
+		$whr1 = array('fuel_from <=' => $current_date,'fuel_to >=' => $current_date);
+		$where = '(courier_id="'.$courier_id.'" or courier_id = "0") AND (customer_id="'.$customer_id.'" or customer_id = "0")';
+		$this->db->select('*');
+		$this->db->from('courier_fuel');
+		$this->db->where($whr1);
+		$this->db->where($where);
+		$this->db->order_by('customer_id','DESC');
+		// $this->db->where('customer_id',$customer_id);
+		
+		$query	=	$this->db->get();
+		$res1 = $query->row();
+		// $res1 = $this->basic_operation_m->get_table_row('courier_fuel', $whr1);
+
+		if($res1){$fuel_per = $res1->cft; }else{$fuel_per ='0';}
+		if($res1){$fuel_per2 = $res1->air_cft; }else{$fuel_per2 ='0';}
+
+		// echo $this->db->last_query();
+
+		$result2= array('cft_charges'=>7,'air_cft'=>$fuel_per2);
+		echo json_encode($result2);
+	}
 	public function today_shipment_list()
 	{
 		$data = $this->data;
@@ -108,46 +139,11 @@ class Franchise_manager extends CI_Controller
 
 
 
-	// public function getCityList()
-	// {
-	// 	$data = array();
-	// 	$pincode = $this->input->post('pincode');
-	// 	$whr1 = array('pin_code' => $pincode);
-	// 	$res1 = $this->basic_operation_m->selectRecord('pincode', $whr1);
-
-	// 	$pin_code = @$res1->row()->pin_code;
-	//     $city_id = @$res1->row()->city_id;
-	//     $isODA = @$res1->row()->isODA;
-
-	//     if (!$pin_code) {
-	//         $data['status'] = "failed";
-	//         $data['message'] = "Not A valid Pincode or not a servicable";
-	//         echo json_encode($data);
-	//         exit();
-	//     }
-
-	// 	$whr2 = array('id' => $city_id);
-	// 	$res2 = $this->basic_operation_m->selectRecord('city', $whr2);
-	// 	$result2 = $res2->row();
-	// 	$state_id = $res2->row()->state_id;
-
-
-	// 	$whr1 = array('state' => $state_id, 'city' => $city_id);
-	// 	$res1 = $this->basic_operation_m->selectRecord('region_master_details', $whr1);
-
-	// 	$regionid = @$res1->row()->regionid;
-	// 	$result2->regionid = $regionid;
-	// 	$result2->regionid = $regionid;
-
-	// 	$data['status'] = "success";
-	// 	echo json_encode($result2);
-	// }
-
 	public function getCityList()
 	{
 		$data = array();
 		$pincode = $this->input->post('pincode');
-		$whr1 = array('pin_code' => $pincode);
+		$whr1 = array('pin_code' => $pincode,'isdeleted'=>0);
 		$res1 = $this->basic_operation_m->selectRecord('pincode', $whr1);
 
 		$pin_code = @$res1->row()->pin_code;
@@ -182,9 +178,9 @@ class Franchise_manager extends CI_Controller
 	public function getState()
 	{
 		$pincode = $this->input->post('pincode');
-		$whr1 = array('pin_code' => $pincode);
+		$whr1 = array('pin_code' => $pincode,'isdeleted'=>0);
 		$res1 = $this->basic_operation_m->selectRecord('pincode', $whr1);
-
+		
 		$state_id = $res1->row()->state_id;
 		$whr3 = array('id' => $state_id);
 		$res3 = $this->basic_operation_m->selectRecord('state', $whr3);
@@ -280,24 +276,14 @@ class Franchise_manager extends CI_Controller
 		$sub_amount = $this->input->post('sub_amount');
 		$booking_date = $this->input->post('booking_date');
 
-		//   print_r($_POST);die;
-		//print
-		//print_r($customer_id);
 		$get_fuel_id = $this->db->query("select * from franchise_delivery_tbl where delivery_franchise_id = '$customer_id'")->row();
 		$dd = $get_fuel_id->fule_group;
 		$get_fuel_details = $this->db->query("select * from franchise_fule_tbl where group_id = '$dd'")->row();
-
-		//print_r($get_fuel_details);exit; from_date
-
 		$current_date = date("Y-m-d", strtotime($booking_date));
 
 		$whr1 = array('from_date <=' => $current_date, 'to_date >=' => $current_date, 'group_id' => $dd);
 		$res1 = $this->db->query("select * from franchise_fule_tbl where from_date <='$current_date' AND to_date >='$current_date' AND group_id = '$dd' ")->row();
-		//echo $this->db->last_query();exit;
-
-		//print_r($res1);
-
-
+		
 		if ($res1) {
 
 			$fov_rate = $res1->fov_rate;
@@ -343,11 +329,7 @@ class Franchise_manager extends CI_Controller
 			$igst = 0;
 		}
 
-		if ($dispatch_details == 'Cash') {
-			$cgst = 0;
-			$sgst = 0;
-			$igst = 0;
-		}
+		
 
 
 		$grand_total = $sub_total + $cgst + $sgst + $igst;
@@ -806,7 +788,8 @@ class Franchise_manager extends CI_Controller
 			$data['cities'] = $this->basic_operation_m->get_all_result('city', '');
 			$data['states'] = $this->basic_operation_m->get_all_result('state', '');
 
-			$data['customers'] = $this->basic_operation_m->get_all_result('tbl_customers', "customer_id = '$customer_id'");
+			$data['franchise'] = $this->basic_operation_m->get_all_result('tbl_customers', "customer_id = '$customer_id'");
+			$data['customers'] = $this->db->query("SELECT * FROM tbl_customers WHERE franchise_id = '$customer_id' AND (customer_type !='1' OR customer_type !='2') ")->result_array();
 
 			$data['payment_method'] = $this->basic_operation_m->get_all_result('payment_method', '');
 			$data['region_master'] = $this->basic_operation_m->get_all_result('region_master', '');
@@ -876,7 +859,7 @@ class Franchise_manager extends CI_Controller
 			$reciever_city = $this->input->post('reciever_city');
 			$reciever_state = $this->input->post('reciever_state');
 
-			$whr_pincode = array('pin_code' => $reciever_pincode, 'city_id' => $reciever_city, 'state_id' => $reciever_state);
+			$whr_pincode = array('pin_code' => $reciever_pincode, 'city_id' => $reciever_city, 'state_id' => $reciever_state,'isdeleted'=>0);
 			$check_city = $this->basic_operation_m->get_table_row('pincode', $whr_pincode);
 			//echo "++++".$this->db->last_query();
 			if (empty($check_city) && !empty($reciever_city)) {
@@ -1557,7 +1540,7 @@ class Franchise_manager extends CI_Controller
 	public function getCityList_rate()
 	{
 		$pincode = $this->input->post('pincode');
-		$whr1 = array('pin_code' => $pincode);
+		$whr1 = array('pin_code' => $pincode,'isdeleted'=>0);
 		$res1 = $this->basic_operation_m->selectRecord('pincode', $whr1);
 
 		$city_id = $res1->row()->city_id;
@@ -1618,7 +1601,7 @@ class Franchise_manager extends CI_Controller
 	public function getState_rate()
 	{
 		$pincode = $this->input->post('pincode');
-		$whr1 = array('pin_code' => $pincode);
+		$whr1 = array('pin_code' => $pincode,'isdeleted'=>0);
 		$res1 = $this->basic_operation_m->selectRecord('pincode', $whr1);
 
 		$state_id = $res1->row()->state_id;
@@ -1707,7 +1690,7 @@ class Franchise_manager extends CI_Controller
 		$addtional_1000 = 0;
 		$fixed_per_kg_1000 = 0;
 		$tat = 0;
-
+		$rate = 0;
 
 		// $where					= "from_zone_id='" . $sender_zone_id . "' AND to_zone_id='" . $reciver_zone_id . "'";
 
@@ -1851,30 +1834,20 @@ class Franchise_manager extends CI_Controller
 
 					// print_r('$fixed_perkg ='.$fixed_perkg.' $addtional_250='.$addtional_250.' $addtional_500='.$addtional_500.' $addtional_1000='.$addtional_1000.' $fixed_per_kg_1000='.$fixed_per_kg_1000);
 				}
-				// echo $fixed_per_kg_1000; die;
-				// print_r($fixed_per_kg_1000);die;
 
 			}
 
 		}
-
-
 		$frieht = $fixed_perkg + $addtional_250 + $addtional_500 + $addtional_1000 + $fixed_per_kg_1000;
 		$amount = $frieht;
-
-		$whr1 = array('group_id' => @$groupId->fule_group);
-		$res1 = $this->basic_operation_m->get_table_row('franchise_fule_tbl', $whr1);
-		// echo "kddjh";
-		// echo $this->db->last_query();
-		// print_r($res1);
-
-
+		$res1 = $this->db->query("SELECT * FROM franchise_fule_tbl WHERE group_id ='$groupId->fule_group' ORDER BY fuel_id DESC LIMIT 1")->row();
+        // echo $this->db->last_query();die;
 		if ($res1) {
 
 			$cft = 7;
 			$cod = '0';
 			$fov = $res1->fov_min;
-			$docket_charge = $res1->docket_charge;
+			$docket_charge = $res1->awb_rate;
 			$fov_base = $res1->fov_base;
 			$fov_min = $res1->fov_min;
 
@@ -1978,6 +1951,49 @@ class Franchise_manager extends CI_Controller
 		exit;
 	}
 
+	public function getFuelprice()
+	{
+		$customer_id = $this->input->post('customer_id');
+		$courier_id = $this->input->post('courier_id');
+		$booking_date = $this->input->post('booking_date');
+		$current_date = date("Y-m-d", strtotime($booking_date));
+		$whr1 = array('courier_id' => $courier_id, 'fuel_from <=' => $current_date, 'fuel_to >=' => $current_date, 'customer_id =' => $customer_id);
+		$res1 = $this->basic_operation_m->get_table_row('courier_fuel', $whr1);
+		if (empty($res1)) {
+			$whr1 = array('courier_id' => $courier_id, 'fuel_from <=' => $current_date, 'fuel_to >=' => $current_date, 'customer_id =' => '0');
+			$res1 = $this->basic_operation_m->get_query_row("select * from courier_fuel where (courier_id = '$courier_id' or courier_id='0') and fuel_from <= '$current_date' and fuel_to >='$current_date' and (customer_id = '0' or customer_id = '$customer_id') ORDER BY customer_id DESC");
+		}
+		$gst_details = $this->basic_operation_m->get_query_row('select * from tbl_gst_setting order by id desc limit 1');
+		if ($res1) {
+			$fuel_per = $res1->fuel_price;
+		} else {
+			$fuel_per = '0';
+		}
+		$fuel_charge = $res1->fc_type;
+		$tbl_customers_info = $this->basic_operation_m->get_query_row("select gst_charges from tbl_customers where customer_id = '$customer_id'");
+		if ($tbl_customers_info->gst_charges == 1) {
+			     $gst_check = 1;
+				 $cgst_per = $gst_details->cgst;
+				 $sgst_per = $gst_details->sgst;
+				 $igst_per = 0;
+			}else{
+				$gst_check = 2;
+				$cgst_per = 0;
+				$sgst_per = 0;
+				$igst_per = $gst_details->igst;
+
+			}
+			$data = [
+				'custAccess'=> $gst_check,
+				'fuelPrice'=>$fuel_per,
+				'fuel_charge'=>$fuel_charge,
+				'cgst'=>$cgst_per,
+				'sgst'=>$sgst_per,
+				'igst'=>$igst_per
+			];
+		echo json_encode($data);
+
+	}
 	public function calculate_rate()
 	{
 
@@ -2276,7 +2292,7 @@ class Franchise_manager extends CI_Controller
 			$data['pincode'] = $this->db->query("SELECT bs.pincode, b.branch_name, p.* FROM tbl_branch_service bs
 				LEFT JOIN tbl_branch b ON(b.branch_id = bs.branch_id)
 				LEFT JOIN pincode p ON(p.pin_code = bs.pincode)
-				WHERE bs.pincode = $pin
+				WHERE bs.pincode = $pin 
 			")->result();
 		}
 		$this->load->view('franchise/track_service_pincode', $data);
