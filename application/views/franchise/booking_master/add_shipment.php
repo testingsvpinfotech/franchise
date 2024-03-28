@@ -170,7 +170,7 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 col-form-label">Franchise Name</label>
                                         <div class="col-sm-8" id="credit_div">
-                                            <select class="form-control" name="customer_account_id" <?php if($_SESSION['franchise_type']==2){?>  id="customer_account_id" <?php } ?>>
+                                            <select class="form-control" name="customer_account_id" <?php if($_SESSION['franchise_type']==2){?>  id="customer_account_id" <?php }else{ ?> id="franchise_id" <?php } ?>>
                                                 <?php if($_SESSION['franchise_type']==2){ ?>
                                                     <option value="">Select Customer</option>  <?php }
                                                 if (count($franchise)) {
@@ -186,9 +186,13 @@
                                             </select>
                                         </div>
                                          <?php if($_SESSION['franchise_type']==1 OR $_SESSION['franchise_type']==3){ ?>
-                                        <label class="col-sm-4 col-form-label">BNF Customer</label>
+                                            <label class="col-sm-5 col-form-label" id="credit_div_label">Company Customer</label>
+                                        <div class="col-sm-7"> 
+                                            <input type="checkbox" name="company_customer" id="company_customer"  value ='1'>
+                                        </div>
+                                        <label class="col-sm-4 col-form-label">Customer</label>
                                         <div class="col-sm-8" id="credit_div">
-                                            <select class="form-control bnf_customer" name="customer_account_id" id="customer_account_id">
+                                            <select class="form-control bnf_customer" name="customer_account_id" disabled id="customer_account_id">
                                                 <option value="">Select Customer</option>
                                                 <?php
                                                 if (count($customers)) {
@@ -203,10 +207,7 @@
                                                 ?>
                                             </select>
                                         </div>
-                                        <label class="col-sm-5 col-form-label" id="credit_div_label">Franchise Customer</label>
-                                        <div class="col-sm-7"> <br>
-                                            <input type="checkbox" name="company_customer" id="company_customer" value ='1'>
-                                        </div>
+                                        
                                         <?php } ?>
                                     </div>
                                     
@@ -368,14 +369,15 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 col-form-label">GST NO.</label>
                                         <div class="col-sm-8">
-                                            <input type="text" name="receiver_gstno" id="receiver_gstno" maxlength="16" minlength="1" class="form-control">
+                                            <input type="text" name="receiver_gstno" id="receiver_gstno" maxlength="15" minlength="1" class="form-control">
+                                            <div id="validation_message"></div>
                                         </div>
                                     </div>
                                     <?php if($_SESSION['franchise_type']==1 OR $_SESSION['franchise_type']==3){ ?>
                                     <div class=" row">
                                         <label class="col-sm-5 col-form-label" id="credit_div_label">Door Delivery</label>
                                         <div class="col-sm-7"> <br>
-                                            <input type="checkbox" name="door_delivery_acces" id="door_delivery" value="1">
+                                            <input type="checkbox" name="door_delivery_acces" id="door_delivery" value="1" disabled>
                                         </div>
                                     </div>
                                     <?php } ?>
@@ -414,12 +416,24 @@
                                                 <div class="col-sm-4">
                                                     <input type="text" name="chargable_weight" readonly class="form-control my-colorpicker1 chargable_weight" data-attr="1" id="chargable_weight" autocomplete="off" required="required">
                                                 </div>
-                                                <!-- <label class="col-sm-2 col-form-label">Is Volumetric</label>
-                                                <div class="col-sm-4">
-
-                                                    <input type="checkbox" id="is_volumetric" name="fav_language" value="" required="required">
-
-                                                </div> -->
+                                                <?php if($_SESSION['franchise_type']==1 OR $_SESSION['franchise_type']==3){ ?>
+                                                <label class="col-sm-3 col-form-label"><small><b>Is
+															Appointment</b></small>&nbsp;&nbsp;&nbsp;
+                                                            <input type="checkbox" id="is_appointment" name="is_appointment" value="1" disabled>
+                                                        </label>
+												<!-- <div class="col-sm-1">
+													<br>
+													
+												</div> -->
+                                                <!-- <label class="col-sm-3 col-form-label"><small><b>
+															Pickup Charges</b></small>&nbsp;&nbsp;&nbsp;
+                                                            <input type="checkbox" id="pickup_access" name="pickup_access" value="1" disabled>
+                                                        </label> -->
+												<div class="col-sm-1">
+													<br>
+													
+												</div>
+                                                <?php } ?>
                                             </div>
                                             <div id="volumetric_table" style="display:none;">
                                                 <table class="weight-table">
@@ -484,7 +498,7 @@
                             <div class="card-content">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-12">
+                                        <div class="col-12 charges">
                                             <div class="form-group row">
                                                 <label class="col-sm-3 col-form-label">Freight Chg.</label>
                                                 <div class="col-sm-3">
@@ -493,31 +507,8 @@
                                                 <label class="col-sm-3 col-form-label">ODA Chg.</label>
                                                 <div class="col-sm-3">
                                                     <input type="number" name="delivery_charges" class="form-control" value="0" id="delivery_charges" readonly>
-                                                </div>
-                                                
+                                                </div>                                                
                                             </div>
-                                            <?php if($_SESSION['franchise_type']==1 OR $_SESSION['franchise_type']==3){ ?>
-                                            <div class="form-group row">
-                                                 <label class="col-sm-3 col-form-label">Booking Chg.</label>
-                                                <div class="col-sm-3">
-                                                    <input type="number" name="booking_charges" class="form-control" value="0" id="booking_charges" readonly>
-                                                </div>
-                                                 <label class="col-sm-3 col-form-label">Pickup Chg.</label>
-                                                <div class="col-sm-3">
-                                                    <input type="number" name="pickup_charges" class="form-control" value="0" id="pickup_charges" readonly>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">                                                
-                                                 <label class="col-sm-3 col-form-label">Delivery Chg.</label>
-                                                <div class="col-sm-3">
-                                                    <input type="number" name="delivery_charges" class="form-control" value="0" id="delivery_charges" readonly>
-                                                </div>
-                                                 <label class="col-sm-3 col-form-label">Door Delivery Chg.</label>
-                                                <div class="col-sm-3">
-                                                    <input type="number" name="door_delivery_charges" class="form-control" value="0" id="door_delivery_charges" readonly>
-                                                </div>
-                                            </div>
-                                            <?php } ?>
                                             <div class="form-group row">                                                
                                                  <label class="col-sm-3 col-form-label">COD Chg.</label>
                                                 <div class="col-sm-3">
@@ -559,6 +550,42 @@
                                             <!--</div>-->
 
                                         </div>
+                                        <div class="col-12 showcharges" style="height:200px; display:none;">
+                                        <div class="form-group row">
+                                                 <label class="col-sm-12 col-form-label" id="rate_display"></label>
+                                                <div class="col-sm-3">
+                                                    <!-- Charges   -->
+                                                    <input type="hidden" name="frieht" min="1" class="form-control" value="" required  id="frieht1" readonly>
+                                                    <input type="hidden" name="delivery_charges" class="form-control" value="0" id="delivery_charges" readonly>
+                                                    <input type="hidden" name="courier_charges" class="form-control" value="0" id="courier_charges" readonly>
+                                                    <input type="hidden" name="other_charges" class="form-control" value="0" id="other_charges" readonly>
+                                                    <input type="hidden" name="fov_charges" class="form-control"  value="0" id="fov_charges"  readonly>
+                                                    <input type="hidden" name="appt_charges" class="form-control"  value="0" id="appt_charges"  readonly>
+                                                    <input type="hidden" name="awb_charges" class="form-control" value="0" id="awb_charges1" readonly>
+                                                    <input type="hidden" name="pickup_charges" class="form-control" value="0" id="pickup_charges" readonly>
+                                                    <input type="hidden" name="rate" class="form-control" value="0" id="rate" readonly>
+                                                    <input type="hidden" name="topay" class="form-control" value="0" id="green_tax" readonly>
+                                                    <input type="hidden" name="booking_charges" class="form-control" value="0" id="booking_charges" readonly>                  
+                                                    <input type="hidden" name="delivery_c_charges" class="form-control" value="0" id="delivery_ccharges" readonly>
+                                                    <input type="hidden" name="door_delivery_charges" class="form-control" value="0" id="door_delivery_charges" readonly>
+                                                    <input type="hidden" name="amount" class="form-control" value="0" id="amount1" readonly>
+                                                    <input type="hidden" name="fuel_charges" class="form-control" value="0" id="fuel_charges1" readonly>
+                                                        <br>
+                                                    <input type="hidden" name="sub_total" class="form-control" value="0" id="sub_total" readonly>
+                                                    <input type="hidden" name="cgst" class="form-control" value="0" id="cgst" readonly>
+                                                    <input type="hidden" name="sgst" class="form-control" value="0" id="sgst" readonly>
+                                                    <input type="hidden" name="igst" class="form-control" value="0" id="igst" readonly>
+                                                    <input type="hidden" name="grand_total" class="form-control" value="0" id="grand_total" readonly>
+                                                    <br>
+                                                    <!-- franchise Commision  -->             
+                                                    <input type="hidden" name="booking_comission" class="form-control" value="0" id="booking_comission" readonly>                  
+                                                    <input type="hidden" name="delivery_commission" class="form-control" value="0" id="delivery_commission" readonly>                  
+                                                    <input type="hidden" name="door_delivery_share" class="form-control" value="0" id="door_delivery_share" readonly>     
+                                                   
+
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -570,9 +597,9 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
-                                            <div class="row">
+                                            <div class="row charges">
                                                 <div class="col-6">
-                                                    <div class="form-group row" id="payby" style="display:none;">
+                                                <div class="form-group row" id="payby" style="display:none;">
                                                         <label class="col-sm-2 col-form-label">Pay By<span class="compulsory_fields">*</span></label>
                                                         <div class="col-sm-4">
                                                             <select class="form-control" name="payment_method" id="payment_method">

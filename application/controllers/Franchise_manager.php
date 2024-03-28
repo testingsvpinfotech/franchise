@@ -2422,4 +2422,748 @@ class Franchise_manager extends CI_Controller
 		//print_r($data);//die;
 		$this->load->view('franchise/booking_master/awb_available_stock', $data);
 	}
+
+	public function getBNFCustomerRate()
+	{
+		ini_set('display_errors', 0);
+		ini_set('display_startup_errors', 0);
+		error_reporting(E_ALL);
+		$sub_total = 0;
+		$customer_id = $this->input->post('customer_id');
+		$c_courier_id = $this->input->post('c_courier_id');
+		$mode_id = $this->input->post('mode_id');
+		$reciver_city = $this->input->post('city');
+		$reciver_state = $this->input->post('state');
+		$sender_state = $this->input->post('sender_state');
+		$sender_city = $this->input->post('sender_city');
+		$is_appointment = $this->input->post('is_appointment');
+		$packet = $this->input->post('packet');
+		$door_delivery = $this->input->post('door_delivery');
+		// print_r($_POST);		die;
+
+		$whr1 = array('state' => $sender_state, 'city' => $sender_city);
+		$res1 = $this->basic_operation_m->selectRecord('region_master_details', $whr1);
+
+		$sender_zone_id = $res1->row()->regionid;
+		$reciver_zone_id = $this->input->post('receiver_zone_id');
+
+		$doc_type = $this->input->post('doc_type');
+		$actual_weight = $this->input->post('actual_weight');
+		$chargable_weight = $this->input->post('chargable_weight');
+		$receiver_gstno = $this->input->post('receiver_gstno');
+		$booking_date = $this->input->post('booking_date');
+		$invoice_value = $this->input->post('invoice_value');
+		$dispatch_details = $this->input->post('dispatch_details');
+		$franchise_id = $this->input->post('franchise_id');
+		$current_date = date("Y-m-d", strtotime($booking_date));
+		$chargable_weight = $chargable_weight * 1000;
+		$fixed_perkg = 0;
+		$addtional_250 = 0;
+		$addtional_500 = 0;
+		$addtional_1000 = 0;
+		$fixed_per_kg_1000 = 0;
+		$tat = 0;
+		$drum_perkg = 0;
+		$pickup_charges = 0;
+
+		$where = "from_zone_id='" . $sender_zone_id . "' AND to_zone_id='" . $reciver_zone_id . "'";
+
+		$fixed_perkg_result = $this->db->query("select * from tbl_domestic_rate_master where 
+			(customer_id=" . $customer_id . " OR  customer_id=0)
+			AND from_zone_id=" . $sender_zone_id . " AND to_zone_id=" . $reciver_zone_id . "
+			AND (from_state_id=" . $sender_state . " OR from_state_id=0)
+			AND (from_city_id=" . $sender_city . " OR  from_city_id=0)
+			AND (city_id=" . $reciver_city . " OR  city_id=0)
+			AND (state_id=" . $reciver_state . " OR state_id=0)
+			AND (mode_id=" . $mode_id . " OR mode_id=0)
+			AND DATE(`applicable_from`)<='" . $current_date . "'
+			AND DATE(`applicable_to`)>='" . $current_date . "'
+			AND fixed_perkg <> '6'
+			AND (" . $this->input->post('actual_weight') . "
+			BETWEEN weight_range_from AND weight_range_to)  
+			ORDER BY state_id DESC,city_id DESC,customer_id DESC,applicable_from DESC LIMIT 1");
+
+		$frieht = 0;
+		$minimum_rate = 0;
+		$query = $this->db->last_query(); //]die;
+		// echo $this->db->last_query(); die;
+		// echo "<pre>"; print_r($fixed_perkg_result->num_rows()); die;
+
+		if ($fixed_perkg_result->num_rows() > 0) {
+
+			// echo "4444uuuu<pre>";
+			$rate_master = $fixed_perkg_result->result();
+
+			// print_r($rate_master);exit();
+			$minimum_rate = $rate_master[0]->minimum_rate;
+
+			$weight_range_to = round($rate_master[0]->weight_range_to * 1000);
+			$left_weight = ($chargable_weight - $weight_range_to);
+
+			foreach ($rate_master as $key => $values) {
+				$tat = $values->tat;
+				$rate = $values->rate;
+				$minimum_weight1 = $values->minimum_weight;
+				if ($values->fixed_perkg == 0) // 250 gm slab
+				{
+
+					// $fixed_perkg = 0;
+					// $addtional_250 = 0;
+					// $addtional_500 = 0;
+					// $addtional_1000 = 0;
+					// $rate = $values->rate;
+					$fixed_perkg = $values->rate;
+				}
+
+				if ($values->fixed_perkg == 1) // 250 gm slab
+				{
+
+					$slab_weight = ($values->weight_slab < $left_weight) ? $values->weight_slab : $left_weight;
+					$total_slab = $slab_weight / 250;
+					$addtional_250 = $addtional_250 + $total_slab * $values->rate;
+					$left_weight = $left_weight - $slab_weight;
+				}
+
+				if ($values->fixed_perkg == 2) // 500 gm slab
+				{
+					$slab_weight = ($values->weight_slab < $left_weight) ? $values->weight_slab : $left_weight;
+
+					if ($slab_weight < 1000) {
+						if ($slab_weight <= 500) {
+							$slab_weight = 500;
+						} else {
+							$slab_weight = 1000;
+						}
+
+					} else {
+						$diff_ceil = $slab_weight % 1000;
+						$slab_weight = $slab_weight - $diff_ceil;
+
+						if ($diff_ceil <= 500 && $diff_ceil != 0) {
+
+							$slab_weight = $slab_weight + 500;
+						} elseif ($diff_ceil <= 1000 && $diff_ceil != 0) {
+
+							$slab_weight = $slab_weight + 1000;
+						}
+
+
+					}
+
+					$total_slab = $slab_weight / 500;
+					$addtional_500 = $addtional_500 + $total_slab * $values->rate;
+					$left_weight = $left_weight - $slab_weight;
+
+				}
+
+				if ($values->fixed_perkg == 3) // 1000 gm slab
+				{
+					$slab_weight = ($values->weight_slab < $left_weight) ? $values->weight_slab : $left_weight;
+					$total_slab = ceil($slab_weight / 1000);
+
+					$addtional_1000 = $addtional_1000 + $total_slab * $values->rate;
+					$left_weight = $left_weight - $slab_weight;
+				}
+				// echo "hsdskjdhaskjda";exit();
+				if ($values->fixed_perkg == 4 && ($this->input->post('actual_weight') >= $values->weight_range_from && $this->input->post('actual_weight') <= $values->weight_range_to)) // 1000 gm slab
+				{
+					// echo "hsdskjdhaskjda";exit();
+					//$slab_weight = ($values->weight_slab < $left_weight)?$values->weight_slab:$left_weight;	
+					$slab_weight = ($values->weight_slab < $left_weight) ? $values->weight_slab : $left_weight;
+					$total_slab = ceil($chargable_weight / 1000);
+
+					$fixed_perkg = 0;
+					$addtional_250 = 0;
+					$addtional_500 = 0;
+					$addtional_1000 = 0;
+					$rate = $values->rate;
+					
+					$fixed_per_kg_1000 = floatval($total_slab) * floatval($values->rate);
+
+					$left_weight = $left_weight - $slab_weight;
+				}
+				
+				if ($values->fixed_perkg == 5) // Box Fixed slab
+				{
+
+					$slab_weight = ($values->weight_slab < $left_weight) ? $values->weight_slab : $left_weight;
+					$total_slab = $slab_weight / 250;
+					$addtional_250 = $addtional_250 + $total_slab * $values->rate;
+					$left_weight = $left_weight - $slab_weight;
+				}
+
+				if ($values->fixed_perkg == 6) // Per box
+				{
+					$slab_weight = ($values->weight_slab < $left_weight) ? $values->weight_slab : $left_weight;
+					$total_slab = ceil($chargable_weight / 1000);
+
+					$fixed_perkg = 0;
+					$addtional_250 = 0;
+					$addtional_500 = 0;
+					$addtional_1000 = 0;
+					$rate = $values->rate;
+					
+					$fixed_per_kg_1000 = 0;
+					$drum_perkg = $packet * $values->rate;
+					$left_weight = $left_weight - $slab_weight;
+				}
+
+				if ($values->fixed_perkg == 7) // Drum fixed slab
+				{
+
+					$slab_weight = ($values->weight_slab < $left_weight) ? $values->weight_slab : $left_weight;
+					$total_slab = $slab_weight / 250;
+					$addtional_250 = $addtional_250 + $total_slab * $values->rate;
+					$left_weight = $left_weight - $slab_weight;
+				}
+
+				if ($values->fixed_perkg == 8) // 1000 gm slab
+				{
+					$slab_weight = ($values->weight_slab < $left_weight) ? $values->weight_slab : $left_weight;
+					$total_slab = ceil($chargable_weight / 1000);
+
+					$fixed_perkg = 0;
+					$addtional_250 = 0;
+					$addtional_500 = 0;
+					$addtional_1000 = 0;
+					$rate = $values->rate;
+					$fixed_per_kg_1000 = 0;
+					$drum_perkg = $packet * $values->rate;
+					$left_weight = $left_weight - $slab_weight;
+				}
+			}
+
+		}
+		// print_r($drum_perkg);die;
+
+		$frieht1 = $fixed_perkg + $addtional_250 + $addtional_500 + $addtional_1000 + $fixed_per_kg_1000 + $drum_perkg;
+		if($minimum_rate>$frieht1)
+		{
+			$frieht = $minimum_rate;
+		}else{
+			$frieht = $frieht1;
+		}
+		$amount = $frieht;
+		
+	$commision_id = $this->db->query("SELECT * FROM tbl_franchise WHERE fid ='$franchise_id'")->row('commision_id');		
+			if($commision_id !=0){
+				$commision_master = $this->basic_operation_m->get_table_row('tbl_comission_master', ['is_deleted'=>0,'group_id'=>$commision_id]);
+				
+				if(!empty($commision_master)){
+					 $booking_commsion = $commision_master->booking_commission;
+					 $delivery_commission = $commision_master->delivery_commission;
+					 $booking_charges =  ($frieht * $booking_commsion / 100);
+					 $delivery_charges =  ($frieht * $delivery_commission / 100);
+					
+					 if($door_delivery=='1'){
+						$door_delivery_share = $commision_master->door_delivery_share;
+						$door_delivery_charges =  ($frieht * $door_delivery_share / 100);
+					 }else{
+						$door_delivery_share =0;
+						$door_delivery_charges =  0.00;
+					 }
+				}
+			}
+
+		//	$whr1 = array('courier_id' => $c_courier_id);
+		$whr1 = array('courier_id' => $c_courier_id, 'fuel_from <=' => $current_date, 'fuel_to >=' => $current_date, 'customer_id =' => $customer_id);
+		$res1 = $this->basic_operation_m->get_table_row('courier_fuel', $whr1);
+        // echo $this->db->last_query();die;
+	
+		$fovExpiry = "";
+		if ($res1) {
+			$fuel_per = $res1->fuel_price;
+			$fov = $res1->fov_min;
+			$docket_charge = $res1->docket_charge;
+			$fov_base = $res1->fov_base;
+			$fov_min = $res1->fov_min;
+
+			// echo "<pre>";
+			// print_r($res1);exit();
+
+			if ($dispatch_details != 'Cash' && $dispatch_details != 'COD') {
+				$res1->cod = 0;
+			}
+			$appt_charges = 0;
+			if ($is_appointment == 1) {
+				// $res1->appointment_perkg 
+				$appt_charges = ($res1->appointment_perkg * $this->input->post('chargable_weight'));
+
+				if ($res1->appointment_min > $appt_charges) {
+					$appt_charges = $res1->appointment_min;
+				}
+			}
+			// print_r($appt_charges);die;
+
+			if ($dispatch_details != 'ToPay') {
+				$res1->to_pay_charges = 0;
+			}
+
+		
+
+			if ($invoice_value >= $fov_base) {
+				$fov = (($invoice_value / 100) * $res1->fov_above);
+			} elseif ($invoice_value < $res1->fov_base) {
+				$fov = (($invoice_value / 100) * $res1->fov_below);
+			}
+
+			if ($fov < $fov_min) {
+				$fov = $fov_min;
+			}
+
+			if ($dispatch_details == 'COD') {
+				if ($res1->cod != 0) {
+					$cod_detail_Range = $this->basic_operation_m->get_query_row("select * from courier_fuel_detail  where cf_id = '$res1->cf_id' and ('$invoice_value' BETWEEN cod_range_from and cod_range_to)");
+					if (!empty($cod_detail_Range)) {
+						$res1->cod = ($invoice_value * $cod_detail_Range->cod_range_rate / 100);
+					}
+				}
+
+			} else {
+				$res1->cod = 0;
+			}
+
+			if ($dispatch_details == 'ToPay') {
+
+				$to_pay_charges_Range = $this->basic_operation_m->get_query_row("select * from courier_fuel_detail  where cf_id = '$res1->cf_id' and ('$invoice_value' BETWEEN topay_range_from and topay_range_to)");
+				// echo $this->db->last_query();die;
+				if (!empty($to_pay_charges_Range)) {
+					$res1->to_pay_charges = ($invoice_value * $to_pay_charges_Range->topay_range_rate / 100);
+				}
+				// print_r($res1->to_pay_charges);die;
+			} else {
+				$res1->to_pay_charges = 0;
+			}
+
+
+			$to_pay_charges = $res1->to_pay_charges;
+
+			if ($res1->fc_type == 'freight') {
+				$amount = $amount + $fov + $docket_charge + $res1->cod + $res1->to_pay_charges + $appt_charges;
+				$final_fuel_charges = ($amount * $fuel_per / 100);
+			
+			} else {
+				$amount = $amount + $fov + $docket_charge + $res1->cod + $res1->to_pay_charges + $appt_charges;
+				$final_fuel_charges = ($amount * $fuel_per / 100);
+			}
+			$cft = $res1->cft;
+			$cod = $res1->cod;
+		} else {
+			$fovExpiry = "VAS expired or not defined!";
+			$cft = '0';
+			$cod = '0';
+			$fov = '0';
+			$to_pay_charges = '0';
+			$appt_charges = '0';
+			$fuel_per = '0';
+			$docket_charge = '0';
+			$amount = $amount + $fov + $docket_charge + $cod + $to_pay_charges + $appt_charges;
+			$final_fuel_charges = ($amount * $fuel_per / 100);
+		}
+
+		//Cash
+
+
+		$sub_total = ($amount + $final_fuel_charges);
+		$isMinimumValue = "";
+		if ($minimum_rate > $sub_total) {
+			$sub_total = $minimum_rate;
+			$isMinimumValue = "minimum value apply";
+		}
+
+		if ($dispatch_details == 'Cash') {
+			$username = $this->session->userdata("userName");
+			$whr11 = array('username' => $username);
+			$res11 = $this->basic_operation_m->getAll('tbl_users', $whr11);
+			$branch_id = $res11->row()->branch_id;
+
+			$branch_info = $this->db->get_where('tbl_branch', ['branch_id' => $branch_id])->row();
+
+			$state_info = $this->db->get_where('state', ['id' => $sender_state])->row();
+
+			$first_two_char_branch = substr(trim($branch_info->gst_number), 0, 2);
+			// print_r($first_two_char_branch);die;
+			if ($first_two_char_branch == $state_info->statecode) {
+				$cgst = ($sub_total * 9 / 100);
+				$sgst = ($sub_total * 9 / 100);
+				$igst = 0;
+				$grand_total = $sub_total + $cgst + $sgst + $igst;
+			} else {
+				$cgst = 0;
+				$sgst = 0;
+				$igst = ($sub_total * 18 / 100);
+				$grand_total = $sub_total + $igst;
+			}
+		} else {
+			$first_two_char = substr($receiver_gstno, 0, 2);
+
+			if ($receiver_gstno == "") {
+				$first_two_char = 27;
+			}
+
+			$tbl_customers_info = $this->basic_operation_m->get_query_row("select gst_charges from tbl_customers where customer_id = '$customer_id' and isdeleted  = '0'");
+
+			if ($tbl_customers_info->gst_charges == 1) {
+				if ($first_two_char == 27) {
+					$cgst = ($sub_total * 9 / 100);
+					$sgst = ($sub_total * 9 / 100);
+					$igst = 0;
+					$grand_total = $sub_total + $cgst + $sgst + $igst;
+				} else {
+					$cgst = 0;
+					$sgst = 0;
+					$igst = ($sub_total * 18 / 100);
+					$grand_total = $sub_total + $igst;
+				}
+			} else {
+				$cgst = 0;
+				$sgst = 0;
+				$igst = 0;
+				$grand_total = $sub_total + $igst;
+			}
+		}
+		if ($tat > 0) {
+			$tat_date = date('Y-m-d', strtotime($booking_date . " + $tat days"));
+		} else {
+			$tat_date = date('Y-m-d', strtotime($booking_date . " + 5 days"));
+		}
+		$data = array(
+			//'query' => $query,
+			'sender_zone_id' => $sender_zone_id,
+			'rate' => $rate,
+			'reciver_zone_id' => $reciver_zone_id,
+			'min_weight' => $minimum_weight1,
+			'chargable_weight' => $chargable_weight,
+			'booking_commsion' => $booking_commsion,
+			'delivery_commission' => $delivery_commission,
+			'door_delivery_share' => $door_delivery_share,
+			'door_delivery_charges' => round($door_delivery_charges, 2),
+			'delivery_charges' => round($delivery_charges, 2),
+			'booking_charges' => round($booking_charges, 2),
+			'frieht' => round($frieht, 2),
+			'fov' => round($fov, 2),
+			'appt_charges' => round($appt_charges, 2),
+			'docket_charge' => round($docket_charge, 2),
+			'amount' => round($amount, 2),
+			'cod' => round($cod, 2),
+			'cft' => round($cft, 2),
+			'to_pay_charges' => round($to_pay_charges, 2),
+			'final_fuel_charges' => round($final_fuel_charges, 2),
+			'sub_total' => number_format($sub_total, 2, '.', ''),
+			'cgst' => number_format($cgst, 2, '.', ''),
+			'sgst' => number_format($sgst, 2, '.', ''),
+			'igst' => number_format($igst, 2, '.', ''),
+			'grand_total' => number_format($grand_total, 2, '.', ''),
+			'isMinimumValue' => $isMinimumValue,
+			'fovExpiry' => $fovExpiry,
+		);
+		echo json_encode($data);
+		exit;
+	}
+
+	public function get_perbox_rate()
+	{
+		ini_set('display_errors', '1');
+		ini_set('display_startup_errors', '1');
+		error_reporting(E_ALL);
+
+		$sub_total = 0;
+		$customer_id = $this->input->post('customer_id');
+		$c_courier_id = $this->input->post('c_courier_id');
+		$mode_id = $this->input->post('mode_id');
+		$reciver_city = $this->input->post('city');
+		$reciver_state = $this->input->post('state');
+		$sender_state = $this->input->post('sender_state');
+		$sender_city = $this->input->post('sender_city');
+		$is_appointment = $this->input->post('is_appointment');
+		$packet = $this->input->post('packet');
+		$door_delivery = $this->input->post('door_delivery');
+		$actual_weight = $this->input->post('actual_weight');
+		$whr1 = array('state' => $sender_state, 'city' => $sender_city);
+		$res1 = $this->basic_operation_m->selectRecord('region_master_details', $whr1);
+		$sender_zone_id = $res1->row()->regionid;
+		$reciver_zone_id = $this->input->post('receiver_zone_id');
+		$doc_type = $this->input->post('doc_type');
+		$chargable_weight = $this->input->post('chargable_weight');
+		$chargable_weight1 = $this->input->post('chargable_weight');
+		$receiver_gstno = $this->input->post('receiver_gstno');
+		$booking_date = $this->input->post('booking_date');
+		$invoice_value = $this->input->post('invoice_value');
+		$dispatch_details = $this->input->post('dispatch_details');
+		$per_box = $this->input->post('per_box');
+		$perBox_actual = $this->input->post('perBox_actual');
+		$franchise_id = $this->input->post('franchise_id');
+	
+		$current_date = date("Y-m-d", strtotime($booking_date));
+		$chargable_weight = $chargable_weight * 1000;
+		$fixed_perkg = 0;
+		$addtional_250 = 0;
+		$addtional_500 = 0;
+		$addtional_1000 = 0;
+		$fixed_per_kg_1000 = 0;
+		$tat = 0;
+		$pickup = 0;
+		$drum_perkg = 0;
+		$actual_weight_exp = explode(',', $perBox_actual);
+		$per_box_exp = explode(',', $per_box);
+		$rate_all = [];
+		$not_d_rate = [];
+		for ($i = 0; $i <= count($actual_weight_exp); $i++) {
+			if (!empty($actual_weight_exp[$i]) && !empty($per_box_exp[$i])) {
+				$weight = $actual_weight_exp[$i] / $per_box_exp[$i];
+				$where = "from_zone_id='" . $sender_zone_id . "' AND to_zone_id='" . $reciver_zone_id . "'";
+				$fixed_perkg_result = $this->db->query("select * from tbl_domestic_rate_master where 
+						(customer_id='$customer_id' OR  customer_id=0)
+						AND from_zone_id='$sender_zone_id' AND to_zone_id='$reciver_zone_id'
+						AND (from_state_id='$sender_state' OR from_state_id=0)
+						AND (from_city_id='$sender_city' OR  from_city_id=0)
+						AND (city_id='$reciver_city' OR  city_id=0)
+						AND (state_id='$reciver_state' || state_id=0)
+						AND (mode_id='$mode_id' || mode_id=0)
+						AND DATE(`applicable_from`)<='$current_date'
+						AND DATE(`applicable_to`)>='$current_date'
+						AND fixed_perkg = '6'
+						AND ($weight
+						BETWEEN weight_range_from AND weight_range_to)  
+						ORDER BY state_id DESC,city_id DESC,customer_id DESC,applicable_from DESC LIMIT 1");
+				$values = $fixed_perkg_result->row();
+				// echo $this->db->last_query();die;
+				if ($fixed_perkg_result->num_rows() == 0) {
+					$not_d_rate[] = +$weight;
+				}
+				if (!empty($values->rate)) {
+					$rate_all[] = +$values->rate;
+					$min_fright[] = +$values->minimum_rate;
+					$minimum_rate = $values->minimum_rate;
+					$pickup = $values->pickup_charges;
+				}
+			}
+		}
+		$fright = [];
+		$pack = array_values(array_filter($per_box_exp));
+		foreach ($pack as $key1 => $weight) {
+			foreach ($rate_all as $key => $rate_val) {
+				if ($key1 == $key) {
+					$fright2[] = +$rate_all[$key] * $pack[$key];
+				}
+			}
+		}
+		
+		$frieht1 = array_sum($fright2);
+		$value = max($min_fright);
+        if($frieht1>$value)
+		{
+			$frieht = $frieht1;
+			$amount =$frieht1;
+		    $rate = $frieht1;
+		}
+		else
+		{
+			$frieht = $value;
+			$amount =$value;
+		    $rate = $value;
+		}
+		$commision_id = $this->db->query("SELECT * FROM tbl_franchise WHERE fid ='$franchise_id'")->row('commision_id');		
+		if($commision_id !=0){
+			$commision_master = $this->basic_operation_m->get_table_row('tbl_comission_master', ['is_deleted'=>0,'group_id'=>$commision_id]);
+			
+			if(!empty($commision_master)){
+				 $booking_commsion = $commision_master->booking_commission;
+				 $delivery_commission = $commision_master->delivery_commission;
+				 $booking_charges =  ($frieht * $booking_commsion / 100);
+				 $delivery_charges =  ($frieht * $delivery_commission / 100);
+				
+				 if($door_delivery=='1'){
+					$door_delivery_share = $commision_master->door_delivery_share;
+					$door_delivery_charges =  ($frieht * $door_delivery_share / 100);
+				 }else{
+					$door_delivery_share =0;
+					$door_delivery_charges =  0.00;
+				 }
+			}
+		}
+		$whr1 = array('courier_id' => $c_courier_id, 'fuel_from <=' => $current_date, 'fuel_to >=' => $current_date, 'customer_id =' => $customer_id);
+		$res1 = $this->basic_operation_m->get_table_row('courier_fuel', $whr1);	
+		$fovExpiry = "";
+		if ($res1) {
+			$fuel_per = $res1->fuel_price;
+			$fov = $res1->fov_min;
+			$docket_charge = $res1->docket_charge;
+			$fov_base = $res1->fov_base;
+			$fov_min = $res1->fov_min;
+
+			if ($dispatch_details != 'Cash' && $dispatch_details != 'COD') {
+				$res1->cod = 0;
+			}
+			$appt_charges = 0;
+			if ($is_appointment == 1) {
+				// $res1->appointment_perkg 
+				$appt_charges = ($res1->appointment_perkg * $this->input->post('chargable_weight'));
+
+				if ($res1->appointment_min > $appt_charges) {
+					$appt_charges = $res1->appointment_min;
+				}
+			}
+			
+
+			if ($dispatch_details != 'ToPay') {
+				$res1->to_pay_charges = 0;
+			}
+
+			if ($invoice_value >= $fov_base) {
+				$fov = (($invoice_value / 100) * $res1->fov_above);
+			} elseif ($invoice_value < $res1->fov_base) {
+				$fov = (($invoice_value / 100) * $res1->fov_below);
+			}
+
+			if ($fov < $fov_min) {
+				$fov = $fov_min;
+			}
+
+			if ($dispatch_details == 'COD') {
+				if ($res1->cod != 0) {
+					$cod_detail_Range = $this->basic_operation_m->get_query_row("select * from courier_fuel_detail  where cf_id = '$res1->cf_id' and ('$invoice_value' BETWEEN cod_range_from and cod_range_to)");
+					if (!empty($cod_detail_Range)) {
+						$res1->cod = ($invoice_value * $cod_detail_Range->cod_range_rate / 100);
+					}
+				}
+
+			} else {
+				$res1->cod = 0;
+			}
+
+			if ($dispatch_details == 'ToPay') {
+
+				$to_pay_charges_Range = $this->basic_operation_m->get_query_row("select * from courier_fuel_detail  where cf_id = '$res1->cf_id' and ('$invoice_value' BETWEEN topay_range_from and topay_range_to)");
+				if (!empty($to_pay_charges_Range)) {
+					$res1->to_pay_charges = ($invoice_value * $to_pay_charges_Range->topay_range_rate / 100);
+				}
+			} else {
+				$res1->to_pay_charges = 0;
+			}
+			$to_pay_charges = $res1->to_pay_charges;
+			if ($res1->fc_type == 'freight') {
+				$final_fuel_charges = ($amount * $fuel_per / 100);
+				$amount = $amount + $fov + $docket_charge + $res1->cod + $res1->to_pay_charges + $appt_charges;
+			} else {
+				$amount = $amount + $fov + $docket_charge + $res1->cod + $res1->to_pay_charges + $appt_charges;
+				$final_fuel_charges = ($amount * $fuel_per / 100);
+			}
+			$cft = $res1->cft;
+			$cod = $res1->cod;
+		} else {
+			$fovExpiry = "VAS expired or not defined!";
+			$cft = '0';
+			$cod = '0';
+			$fov = '0';
+			$to_pay_charges = '0';
+			$appt_charges = '0';
+			$fuel_per = '0';
+			$docket_charge = '0';
+			$amount = $amount + $fov + $docket_charge + $cod + $to_pay_charges + $appt_charges;
+			$final_fuel_charges = ($amount * $fuel_per / 100);
+		}
+		$sub_total = ($amount + $final_fuel_charges);
+		$isMinimumValue = "";
+		if ($minimum_rate > $sub_total) {
+			$sub_total = $minimum_rate;
+			$isMinimumValue = "minimum value apply";
+		}
+		if ($dispatch_details == 'Cash') {
+			$username = $this->session->userdata("userName");
+			$whr11 = array('username' => $username);
+			$res11 = $this->basic_operation_m->getAll('tbl_users', $whr11);
+			$branch_id = $res11->row()->branch_id;
+
+			$branch_info = $this->db->get_where('tbl_branch', ['branch_id' => $branch_id])->row();
+
+			$state_info = $this->db->get_where('state', ['id' => $sender_state])->row();
+
+			$first_two_char_branch = substr(trim($branch_info->gst_number), 0, 2);
+			if ($first_two_char_branch == $state_info->statecode) {
+				$cgst = ($sub_total * 9 / 100);
+				$sgst = ($sub_total * 9 / 100);
+				$igst = 0;
+				$grand_total = $sub_total + $cgst + $sgst + $igst;
+			} else {
+				$cgst = 0;
+				$sgst = 0;
+				$igst = ($sub_total * 18 / 100);
+				$grand_total = $sub_total + $igst;
+			}
+		} else {
+			$first_two_char = substr($receiver_gstno, 0, 2);
+
+			if ($receiver_gstno == "") {
+				$first_two_char = 27;
+			}
+			$tbl_customers_info = $this->basic_operation_m->get_query_row("select gst_charges from tbl_customers where customer_id = '$customer_id' and isdeleted  = '0' ");
+			if ($tbl_customers_info->gst_charges == 1) {
+				if ($first_two_char == 27) {
+					$cgst = ($sub_total * 9 / 100);
+					$sgst = ($sub_total * 9 / 100);
+					$igst = 0;
+					$grand_total = $sub_total + $cgst + $sgst + $igst;
+				} else {
+					$cgst = 0;
+					$sgst = 0;
+					$igst = ($sub_total * 18 / 100);
+					$grand_total = $sub_total + $igst;
+				}
+			} else {
+				$cgst = 0;
+				$sgst = 0;
+				$igst = 0;
+				$grand_total = $sub_total + $igst;
+			}
+		}
+		if ($tat > 0) {
+			$tat_date = date('Y-m-d', strtotime($booking_date . " + $tat days"));
+		} else {
+			$tat_date = date('Y-m-d', strtotime($booking_date . " + 5 days"));
+		}
+		if (!empty($rate)) {
+			$data = array(
+				//'query' => $query,
+				'sender_zone_id' => $sender_zone_id,
+				'rate' => $rate,
+				'reciver_zone_id' => $reciver_zone_id,
+				'min_weight' => $minimum_rate,
+				'chargable_weight' => $chargable_weight,
+				'booking_commsion' => $booking_commsion,
+				'delivery_commission' => $delivery_commission,
+				'door_delivery_share' => $door_delivery_share,
+				'door_delivery_charges' => round($door_delivery_charges, 2),
+				'delivery_charges' => round($delivery_charges, 2),
+				'booking_charges' => round($booking_charges, 2),
+				'frieht' => round($frieht, 2),
+				'fov' => round($fov, 2),
+				'appt_charges' => round($appt_charges, 2),
+				'docket_charge' => round($docket_charge, 2),
+				'amount' => round($amount, 2),
+				'cod' => round($cod, 2),
+				'cft' => round($cft, 2),
+				'to_pay_charges' => round($to_pay_charges, 2),
+				'final_fuel_charges' => round($final_fuel_charges, 2),
+				'sub_total' => number_format($sub_total, 2, '.', ''),
+				'cgst' => number_format($cgst, 2, '.', ''),
+				'sgst' => number_format($sgst, 2, '.', ''),
+				'igst' => number_format($igst, 2, '.', ''),
+				'grand_total' => number_format($grand_total, 2, '.', ''),
+				'isMinimumValue' => $isMinimumValue,
+				'fovExpiry' => $fovExpiry,
+				'Message' => '',
+			);
+
+			if (!empty($not_d_rate)) {
+				$rate = implode(" ", $not_d_rate);
+				$data['rate_message'] = 'This Weight detials are rate not defined ' . $rate;
+			} else {
+				$data['rate_message'] = '';
+			}
+		}		
+		echo json_encode($data);
+		exit;
+	}
+
 }

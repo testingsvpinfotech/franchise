@@ -51,30 +51,7 @@ jQuery(document).ready(function () {
 
 	// Final Submission 
 // Rate calculate on submit 
-$("#desabledBTN").click(function() {
-	// var text = window.location.pathname;
-	// const edit_shipment = text.split("/", 5);
-	// if(edit_shipment[3] == 'admin-edit-view-list')
-	// {
-	// 	if ($('#is_rate').is(':checked')) 
-	// 	{
-	// 		var bill_type = $('#dispatch_details').val();
-	// 		var frieht = $('#frieht').val();
-	// 		if(bill_type!='' && frieht !='')
-	// 		{
-	// 			$('#desabledBTN').prop('disabled', true);
-	// 			ChargableWeightCalcu();
-	// 			ValumetricRowcalcu();
-	// 			calculateTotalWeight();
-	// 			getRate(0);
-	// 			shipmentGST_calcu();
-	// 			$('#desabledBTN').prop('disabled', true);
-	// 		}
-			
-	// 	}else{
-	// 		shipmentGST_calcu();
-	// 	}
-	// }else{
+$("#desabledBTN").click(function() {	
 		var bill_type = $('#dispatch_details').val();
 		var frieht = $('#frieht').val();
 		if(bill_type!='' && frieht !='')
@@ -85,12 +62,19 @@ $("#desabledBTN").click(function() {
 			ChargableWeightCalcu();
 			ValumetricRowcalcu();
 			calculateTotalWeight();
-			getRate();
+			var franchise_type = $('#franchise_type').val();
+			if(franchise_type ==1 || franchise_type ==3){
+				if ($('#company_customer').is(':checked') && $('#customer_account_id').val()!='') {
+					getBNFCustomerRate(0);
+				}else{
+					getRate(0);			
+				}
+			}else{
+				getRate(0);
+			}
 			fuelCalculate();
 			$('#desabledBTN').prop('disabled', true);
-		}
-	// }
-	
+		}	
 });
 	// by default value matric row hide 
 	$("#volumetric_table").hide();
@@ -240,6 +224,11 @@ $("#desabledBTN").click(function() {
 					option += '<option value="' + d.id + '">' + d.city + '</option>';
 					$('#reciever_city').html(option);
 					getZone();
+					var cft = parseFloat($("#cft").val());
+						if (isNaN(cft)) { var cft = 0; }
+						if (cft == 0 || cft == '') {
+							calculate_cft();
+						}
 				}
 			});
 		}
@@ -279,6 +268,18 @@ $("#desabledBTN").click(function() {
 		}
 	});
 
+	// Gst No validated formate 
+	$('#receiver_gstno').on('blur', function() {
+        var gstin = $(this).val();
+        var regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/;
+        if(gstin !=''){
+		if (regex.test(gstin)) {
+            $('#validation_message').text('Valid GSTIN').css('color', 'green');
+        } else {
+            $('#validation_message').text('Invalid GSTIN').css('color', 'red');
+        }
+		}
+    });
 
 	/* Add Shipment and also edit shipment in BNF PORTAL
 		it's Creadting value matric row according no_of_pack (PKT) in details =>
@@ -376,10 +377,302 @@ $("#desabledBTN").click(function() {
 
 	// this function is use for getting charges acording chargeble weight input field 
 	$("#valumetric_chageable").blur(function () {
-		getRate(0);
+		var franchise_type = $('#franchise_type').val();
+		if(franchise_type ==1 || franchise_type ==3){
+			if ($('#company_customer').is(':checked') && $('#customer_account_id').val()!='') {
+				getBNFCustomerRate(0);
+			}else{
+				getRate(0);				
+			}
+		}else{
+			getRate(0);
+		}
 	});
 
 
+	function getBNFCustomerRate(update) {
+		if ($('#is_appointment').is(':checked')) {
+			var is_appointment = 1;
+		}
+		else {
+			var is_appointment = 0;
+		}
+		if ($('#door_delivery').is(':checked')) {
+			var door_delivery = 1;
+		}
+		else {
+			var door_delivery = 0;
+		}
+	
+		var customer_id = $('#customer_account_id').val();
+		var c_courier_id = $('#courier_company').val();
+		var mode_id = $('#mode_dispatch').val();
+		var sender_state = $("#sender_state").val();
+		var sender_city = $("#sender_city").val();
+		var state = $("#reciever_state").val();
+		var city = $("#reciever_city").val();
+		var doc_type = $("#doc_typee").val();
+		var franchise_id = $("#franchise_id").val();
+		var receiver_zone_id = $("#receiver_zone_id").val();
+		var receiver_gstno = $("#receiver_gstno").val();
+		var booking_date = $('#booking_date').val();
+		var dispatch_details = $('#dispatch_details').val();
+		var invoice_value = $('#invoice_value').val();
+		var invoice_value = parseFloat(($('#invoice_value').val() != '') ? $('#invoice_value').val() : 0);
+
+		var chargable_weight = parseFloat($('#chargable_weight').val()) > 0 ? $('#chargable_weight').val() : 0;
+		var actual_weight = parseFloat($('#actual_weight').val()) > 0 ? $('#actual_weight').val() : 0;
+		let packet = $("#no_of_pack1").val();
+		if (dispatch_details == 'ToPay' && invoice_value == '') {
+			alert('Please Fillup Inv. Value*');
+		}
+		// if (chargable_weight > 0) {
+		if (customer_id != '' && mode_id != '') {
+			$.ajax({
+				type: 'POST',
+				url:  base_url + 'Franchise_manager/getBNFCustomerRate',
+				data: 'packet=' + packet + '&customer_id=' + customer_id + '&c_courier_id=' + c_courier_id + '&mode_id=' + mode_id + '&state=' + state + '&city=' + city + '&chargable_weight=' + chargable_weight + '&receiver_zone_id=' + receiver_zone_id + '&receiver_gstno=' + receiver_gstno + '&booking_date=' + booking_date + '&invoice_value=' + invoice_value + '&dispatch_details=' + dispatch_details + '&sender_state=' + sender_state + '&sender_city=' + sender_city + '&is_appointment=' + is_appointment + '&actual_weight=' + actual_weight+'&door_delivery='+door_delivery+'&franchise_id='+franchise_id,
+				dataType: "json",
+				success: function (data) {
+
+					console.log(data);
+					$('#frieht').val(data.frieht);
+					if (update) {
+
+					} else {
+
+					}
+					if (data.frieht == '0') {
+						$('#frieht').val('');
+						// alert(data.frieht);
+						var table_row = $('#volumetric_table_row tr').length;
+						getPerBox_fright(table_row);
+					} else {
+						$('#rate_display').html('Rate Apply Successfully').css('color','green');
+                        //  charges 
+						$('#frieht1').val(data.frieht);
+						$('#awb_charges1').val(data.docket_charge);
+						$('#rate').val(data.rate);
+						$('#fov_charges').val(data.fov)
+						$('#appt_charges').val(data.appt_charges);
+						$('#fuel_charges').val(data.final_fuel_charges);
+						$('#green_tax').val(data.to_pay_charges);
+						$('#courier_charges').val(data.cod);
+
+						// commision master 
+						
+						$('#booking_comission').val(data.booking_commsion);
+						$('#delivery_commission').val(data.delivery_commission);
+						$('#door_delivery_share').val(data.door_delivery_share);
+						$('#booking_charges').val(data.booking_charges);
+						$('#pickup_charges').val(data.pickup_charges);
+						$('#delivery_ccharges').val(data.delivery_charges);
+						$('#door_delivery_charges').val(data.door_delivery_charges);
+						$('#fuel_charges1').val(data.final_fuel_charges);
+						$('#sub_total').val(data.sub_total);
+						$('#amount1').val(data.amount);
+						$('#cgst').val(data.cgst);
+						$('#sgst').val(data.sgst);
+						$('#igst').val(data.igst);
+						$('#grand_total').val(data.grand_total);
+						$('#cft').val(data.cft);
+						$('#isMinimumValue').html(data.isMinimumValue);
+						if (data.fovExpiry) {
+							alert(data.fovExpiry);
+							// $("#desabledBTN").attr();
+							$('#desabledBTN').prop('disabled', true);
+
+						} else {
+							// $('#desabledBTN').prop('disabled', false);
+						}
+
+
+					}
+				},
+				error: function () {
+					$('#frieht').val('');
+					// alert(data.frieht);
+					var table_row = $('#volumetric_table_row tr').length;
+					getPerBox_fright(table_row);
+				}
+			});
+		}
+		else {
+			$('#frieht').val();
+		}
+	}
+
+	function getPerBox_fright(update) {
+		if (update > 0) {
+			var non_of_pack = [];
+			var actual_w = [];
+
+			for (var jk = 1; jk <= update; jk++) {
+
+				if ($('#valumetric_actual' + jk).val() != '' || $('#valumetric_actual' + jk).val() != null) {
+					var a_w = [];
+					a_w[jk] = $('#valumetric_actual' + jk).val();
+					actual_w.push(a_w);
+				}
+				if ($('#per_box_weight' + jk).val() != '' || $('#per_box_weight' + jk).val() != null) {
+					var no = [];
+					no[jk] = $('#per_box_weight' + jk).val();
+					non_of_pack.push(no);
+				}
+			}
+			// ChargableWeightCalcu();
+			if ($('#is_appointment').is(':checked')) {
+				var is_appointment = 1;
+			}
+			else {
+				var is_appointment = 0;
+			}
+			if ($('#door_delivery').is(':checked')) {
+				var door_delivery = 1;
+			}
+			else {
+				var door_delivery = 0;
+			}
+			
+			var customer_id = $('#customer_account_id').val();
+			var c_courier_id = $('#courier_company').val();
+			var mode_id = $('#mode_dispatch').val();
+			var sender_state = $("#sender_state").val();
+			var sender_city = $("#sender_city").val();
+			var state = $("#reciever_state").val();
+			var city = $("#reciever_city").val();
+			var doc_type = $("#doc_typee").val();
+			var franchise_id = $("#franchise_id").val();
+			var receiver_zone_id = $("#receiver_zone_id").val();
+			var receiver_gstno = $("#receiver_gstno").val();
+			var booking_date = $('#booking_date').val();
+			var dispatch_details = $('#dispatch_details').val();
+			var invoice_value = $('#invoice_value').val();
+			var invoice_value = parseFloat(($('#invoice_value').val() != '') ? $('#invoice_value').val() : 0);
+	
+			var chargable_weight = parseFloat($('#chargable_weight').val()) > 0 ? $('#chargable_weight').val() : 0;
+			var actual_weight = parseFloat($('#actual_weight').val()) > 0 ? $('#actual_weight').val() : 0;
+			let packet = $("#no_of_pack1").val();
+			if (dispatch_details == 'ToPay' && invoice_value == '') {
+				alert('Please Fillup Inv. Value*');
+			}
+			// if (chargable_weight > 0) {
+			if (customer_id != '' && mode_id != '') {
+				$.ajax({
+					type: 'POST',
+					url: base_url + 'Franchise_manager/get_perbox_rate',
+					data: 'packet=' + packet + '&customer_id=' + customer_id + '&c_courier_id=' + c_courier_id + '&mode_id=' + mode_id + '&state=' + state + '&city=' + city + '&chargable_weight=' + chargable_weight + '&receiver_zone_id=' + receiver_zone_id + '&receiver_gstno=' + receiver_gstno + '&booking_date=' + booking_date + '&invoice_value=' + invoice_value + '&dispatch_details=' + dispatch_details + '&sender_state=' + sender_state + '&sender_city=' + sender_city + '&is_appointment=' + is_appointment+ '&per_box=' + non_of_pack + '&perBox_actual=' + actual_w + '&actual_weight=' + actual_weight+'&door_delivery='+door_delivery+'&franchise_id='+franchise_id,
+					dataType: "json",
+					success: function (data) {
+						if (data.rate_message != '') {
+							alert(data.rate_message);
+						}
+						if (data.Message == 'Rate Not defined Please check Rate') {
+							alert(data.Message);
+						}
+						else {
+
+							$('#frieht').val(data.frieht);
+							
+							if (data.frieht > 0) {
+										 //  charges 
+									$('#rate_display').html('Rate Apply Successfully').css('color','green');
+									$('#frieht1').val(data.frieht);
+									$('#awb_charges1').val(data.docket_charge);
+									$('#rate').val(data.rate);
+									$('#fov_charges').val(data.fov)
+									$('#appt_charges').val(data.appt_charges);
+									$('#fuel_charges').val(data.final_fuel_charges);
+									$('#green_tax').val(data.to_pay_charges);
+									$('#courier_charges').val(data.cod);
+
+									// commision master 
+									
+									$('#booking_comission').val(data.booking_commsion);
+									$('#delivery_commission').val(data.delivery_commission);
+									$('#door_delivery_share').val(data.door_delivery_share);
+									$('#booking_charges').val(data.booking_charges);
+									$('#pickup_charges').val(data.pickup_charges);
+									$('#delivery_ccharges').val(data.delivery_charges);
+									$('#door_delivery_charges').val(data.door_delivery_charges);
+									$('#fuel_charges1').val(data.final_fuel_charges);
+									$('#sub_total').val(data.sub_total);
+									$('#amount1').val(data.amount);
+									$('#cgst').val(data.cgst);
+									$('#sgst').val(data.sgst);
+									$('#igst').val(data.igst);
+									$('#grand_total').val(data.grand_total);
+									$('#cft').val(data.cft);
+									$('#isMinimumValue').html(data.isMinimumValue);
+									var actual_weight = $('#actual_weight').val();
+									var chargable_weight = $('#chargable_weight').val();
+									var val_actual = $('#valumetric_actual').val();
+									if (chargable_weight == '') {
+
+									if (val_actual > actual_weight) {
+										$('#chargable_weight').val(val_actual);
+									}
+									else if (actual_weight < data.min_weight) {
+										$('#chargable_weight').val(data.min_weight);
+									}
+									else {
+										$('#chargable_weight').val(actual_weight);
+									}
+
+								}
+								
+								if (data.fovExpiry) {
+									alert(data.fovExpiry);
+									// $("#desabledBTN").attr();
+									$('#desabledBTN').prop('disabled', true);
+
+								}
+							} else {
+								$('#frieht').val('');
+							}
+						}
+					},
+					error: function () {
+						$('#frieht').val('');
+						$('#rate_display').html('Rate Not Define. please contact to customer.').css('color','red');
+						resetCharges();
+					}
+				});
+			}
+			else {
+				$('#frieht').val();
+			}
+			// } else {
+			// 	$('#frieht').val('');
+			// }
+		}
+	}
+
+	function resetCharges(){
+		$('#frieht1').val('');
+		$('#awb_charges1').val('');
+		$('#rate').val('');
+		$('#fov_charges').val('');
+		$('#appt_charges').val('');
+		$('#fuel_charges').val('');
+		$('#green_tax').val('');
+		$('#courier_charges').val('');
+		// commision master 
+		$('#booking_comission').val('');
+		$('#delivery_commission').val('');
+		$('#door_delivery_share').val('');
+		$('#booking_charges').val('');
+		$('#pickup_charges').val('');
+		$('#delivery_ccharges').val('');
+		$('#door_delivery_charges').val('');
+		$('#fuel_charges1').val('');
+		$('#sub_total').val('');
+		$('#amount1').val('');
+		$('#cgst').val('');
+		$('#sgst').val('');
+		$('#igst').val('');
+		$('#grand_total').val('');
+	}
 
     // walking customer and franchise prepaid rate
 	function getRate(update) {
@@ -408,7 +701,7 @@ $("#desabledBTN").click(function() {
 				$.ajax({
 					type: 'POST',
 					url: base_url + 'Franchise_manager/add_new_rate_domestic',
-					data: 'customer_id=' + customer_id + '&c_courier_id=' + c_courier_id + '&mode_id=' + mode_id + '&state=' + state + '&city=' + city + '&chargable_weight=' + chargable_weight + '&receiver_zone_id=' + receiver_zone_id + '&receiver_gstno=' + receiver_gstno + '&booking_date=' + booking_date + '&invoice_value=' + invoice_value + '&dispatch_details=' + dispatch_details + '&sender_state=' + sender_state + '&sender_city=' + sender_city + '&is_appointment=' + is_appointment + "&region_id=" + region_id + "&doc_type=" + doc_type,
+					data: 'customer_id=' + customer_id + '&c_courier_id=' + c_courier_id + '&mode_id=' + mode_id + '&state=' + state + '&city=' + city + '&chargable_weight=' + chargable_weight + '&receiver_zone_id=' + receiver_zone_id + '&receiver_gstno=' + receiver_gstno + '&booking_date=' + booking_date + '&invoice_value=' + invoice_value + '&dispatch_details=' + dispatch_details + '&sender_state=' + sender_state + '&sender_city=' + sender_city + "&region_id=" + region_id + "&doc_type=" + doc_type,
 					dataType: "json",
 					success: function (data) {
 						$('#frieht').val(data.frieht);
@@ -451,6 +744,11 @@ $("#desabledBTN").click(function() {
 					});
 			}else{
 				if(bnf_customer=="" && $('#company_customer').is(":checked")){				
+					alertify.alert("Shipment Rate Alert!","Customer Not Selected . <br>Please define customer franchise customer or BNF.",
+					function () {
+						alertify.success('Ok');
+					});
+			    }else{				
 					$.ajax({
 						type: 'POST',
 						url: base_url + 'Franchise_manager/add_new_rate_domestic',
@@ -477,11 +775,6 @@ $("#desabledBTN").click(function() {
 							$('#cft').val(data.cft);
 							$('#delivery_date').val(data.tat_date);
 						}
-					});
-			    }else{
-					alertify.alert("Shipment Rate Alert!","Customer Not Selected . <br>Please define customer franchise customer or BNF.",
-					function () {
-						alertify.success('Ok');
 					});
 				}
 			}
@@ -991,26 +1284,29 @@ function calculate_cft() {
 	var courier_id = parseFloat(($('#courier_company').val() != '') ? $('#courier_company').val() : 0);
 	var booking_date = $('#booking_date').val();
 	var customer_account_id = $('#customer_account_id').val();
-
-
-	if (!customer_account_id) {
-		$('#cft').val(7);
-	} else {
+	var franchise_type = $('#franchise_type').val();
+	var cft = $('#cft').val();
+	if(cft==""){
+        if(franchise_type ==1 || franchise_type == 3){
+             if($('.bnf_customer').val()=="" && $('#company_customer').is(":checked")){
+				var customer_account_id = $('#customer_account_id').val();
+			 }else{
+				var customer_account_id = $('#franchise_id').val();
+			 }
+		}else{
+			var customer_account_id = $('#franchise_id').val();
+		}
 		$.ajax({
 			type: 'POST',
 			url: base_url + 'Franchise_manager/available_cft',
 			data: 'courier_id=' + courier_id + '&booking_date=' + booking_date + '&customer_id=' + customer_account_id,
 			dataType: "json",
-			success: function (data) {
-				// alert(data.cft_charges);	
-				// if(data.cft_charges=="0")
-				// {
-
-				// }else{
+			success: function (data) {				
 				$('#cft').val(data.cft_charges);
 				$('#air_cft').val(data.air_cft);
-				// }
-
+			},
+			error: function () {
+				$('#cft').val(7);
 			}
 		});
 	}
@@ -1064,7 +1360,7 @@ function checkForTheCondition() {
 $('.bnf_customer').change(function(){
    var bnf_cut = $(this).val();
    if(bnf_cut!=''){
-	  $("#company_customer").prop("disabled", true);
+	//   $("#company_customer").prop("disabled", true);
    }else
    {
 	$('#sender_name').val('');
@@ -1080,10 +1376,28 @@ $('.bnf_customer').change(function(){
 
 $('#company_customer').change(function(){
    if($('#company_customer').is(":checked")){
-	  $(".bnf_customer").prop("disabled", true);
+	$(".bnf_customer").prop("disabled", false);
+	$("#is_appointment").prop("disabled", false);
+	$("#door_delivery").prop("disabled", false);
+	$('.charges').hide();
+	$('.showcharges').show();
    }else
    {
-	$(".bnf_customer").prop("disabled", false);
+	
+	$("#is_appointment").prop("disabled", true);
+	$("#door_delivery").prop("disabled", true);
+	$('.charges').show();
+	$('.showcharges').hide();
+	$('#sender_name').val('');
+	$('#sender_address').val('');
+	$('#sender_pincode').val('');
+	$('#sender_contactno').val('');
+	$('#sender_gstno').val('');
+	$('.bnf_customer').val('');
+	$('#sender_state').html('<option value="">Select State</option>');
+	$('#sender_city').html('<option value="">Select City</option>');
+	$("#company_customer").prop("disabled", false);
+	$(".bnf_customer").prop("disabled", true);
    }
 });
 // credit case walking customer or bnf customer blocking system  end
