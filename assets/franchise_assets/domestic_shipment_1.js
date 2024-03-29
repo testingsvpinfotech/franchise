@@ -443,7 +443,7 @@ $("#desabledBTN").click(function() {
 
 					}
 					if (data.frieht == '0') {
-						$('#frieht').val('');
+						$('#frieht1').val('');
 						// alert(data.frieht);
 						var table_row = $('#volumetric_table_row tr').length;
 						getPerBox_fright(table_row);
@@ -452,12 +452,12 @@ $("#desabledBTN").click(function() {
                         //  charges 
 						$('#frieht1').val(data.frieht);
 						$('#awb_charges1').val(data.docket_charge);
-						$('#rate').val(data.rate);
-						$('#fov_charges').val(data.fov)
-						$('#appt_charges').val(data.appt_charges);
-						$('#fuel_charges').val(data.final_fuel_charges);
-						$('#green_tax').val(data.to_pay_charges);
-						$('#courier_charges').val(data.cod);
+						$('#rate1').val(data.rate);
+						$('#fov_charges1').val(data.fov)
+						$('#appt_charges1').val(data.appt_charges);
+						$('#fuel_charges1').val(data.final_fuel_charges);
+						$('#green_tax1').val(data.to_pay_charges);
+						$('#courier_charges1').val(data.cod);
 
 						// commision master 
 						
@@ -465,16 +465,16 @@ $("#desabledBTN").click(function() {
 						$('#delivery_commission').val(data.delivery_commission);
 						$('#door_delivery_share').val(data.door_delivery_share);
 						$('#booking_charges').val(data.booking_charges);
-						$('#pickup_charges').val(data.pickup_charges);
-						$('#delivery_ccharges').val(data.delivery_charges);
-						$('#door_delivery_charges').val(data.door_delivery_charges);
+						$('#pickup_charges1').val(data.pickup_charges);
+						$('#delivery_ccharges1').val(data.delivery_charges);
+						$('#door_delivery_charges1').val(data.door_delivery_charges);
 						$('#fuel_charges1').val(data.final_fuel_charges);
-						$('#sub_total').val(data.sub_total);
+						$('#sub_total1').val(data.sub_total);
 						$('#amount1').val(data.amount);
-						$('#cgst').val(data.cgst);
-						$('#sgst').val(data.sgst);
-						$('#igst').val(data.igst);
-						$('#grand_total').val(data.grand_total);
+						$('#cgst1').val(data.cgst);
+						$('#sgst1').val(data.sgst);
+						$('#igst1').val(data.igst);
+						$('#grand_total1').val(data.grand_total);
 						$('#cft').val(data.cft);
 						$('#isMinimumValue').html(data.isMinimumValue);
 						if (data.fovExpiry) {
@@ -579,12 +579,12 @@ $("#desabledBTN").click(function() {
 									$('#rate_display').html('Rate Apply Successfully').css('color','green');
 									$('#frieht1').val(data.frieht);
 									$('#awb_charges1').val(data.docket_charge);
-									$('#rate').val(data.rate);
-									$('#fov_charges').val(data.fov)
-									$('#appt_charges').val(data.appt_charges);
-									$('#fuel_charges').val(data.final_fuel_charges);
-									$('#green_tax').val(data.to_pay_charges);
-									$('#courier_charges').val(data.cod);
+									$('#rate1').val(data.rate);
+									$('#fov_charges1').val(data.fov)
+									$('#appt_charges1').val(data.appt_charges);
+									$('#fuel_charges1').val(data.final_fuel_charges);
+									$('#green_tax1').val(data.to_pay_charges);
+									$('#courier_charges1').val(data.cod);
 
 									// commision master 
 									
@@ -596,12 +596,12 @@ $("#desabledBTN").click(function() {
 									$('#delivery_ccharges').val(data.delivery_charges);
 									$('#door_delivery_charges').val(data.door_delivery_charges);
 									$('#fuel_charges1').val(data.final_fuel_charges);
-									$('#sub_total').val(data.sub_total);
+									$('#sub_total1').val(data.sub_total);
 									$('#amount1').val(data.amount);
-									$('#cgst').val(data.cgst);
-									$('#sgst').val(data.sgst);
-									$('#igst').val(data.igst);
-									$('#grand_total').val(data.grand_total);
+									$('#cgst1').val(data.cgst);
+									$('#sgst1').val(data.sgst);
+									$('#igst1').val(data.igst);
+									$('#grand_total1').val(data.grand_total);
 									$('#cft').val(data.cft);
 									$('#isMinimumValue').html(data.isMinimumValue);
 									var actual_weight = $('#actual_weight').val();

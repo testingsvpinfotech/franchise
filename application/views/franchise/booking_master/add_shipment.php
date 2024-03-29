@@ -192,7 +192,7 @@
                                         </div>
                                         <label class="col-sm-4 col-form-label">Customer</label>
                                         <div class="col-sm-8" id="credit_div">
-                                            <select class="form-control bnf_customer" name="customer_account_id" disabled id="customer_account_id">
+                                            <select class="form-control bnf_customer" name="customer_id" disabled id="customer_account_id">
                                                 <option value="">Select Customer</option>
                                                 <?php
                                                 if (count($customers)) {
@@ -388,10 +388,6 @@
                     </div>
                 </div>
                 <div class="row">
-
-
-
-
                     <div class="col-md-6 col-sm-12 mt-3">
                         <!-- Measurement Units -->
                         <div class="card">
@@ -556,26 +552,26 @@
                                                 <div class="col-sm-3">
                                                     <!-- Charges   -->
                                                     <input type="hidden" name="frieht" min="1" class="form-control" value="" required  id="frieht1" readonly>
-                                                    <input type="hidden" name="delivery_charges" class="form-control" value="0" id="delivery_charges" readonly>
-                                                    <input type="hidden" name="courier_charges" class="form-control" value="0" id="courier_charges" readonly>
-                                                    <input type="hidden" name="other_charges" class="form-control" value="0" id="other_charges" readonly>
-                                                    <input type="hidden" name="fov_charges" class="form-control"  value="0" id="fov_charges"  readonly>
-                                                    <input type="hidden" name="appt_charges" class="form-control"  value="0" id="appt_charges"  readonly>
-                                                    <input type="hidden" name="awb_charges" class="form-control" value="0" id="awb_charges1" readonly>
-                                                    <input type="hidden" name="pickup_charges" class="form-control" value="0" id="pickup_charges" readonly>
-                                                    <input type="hidden" name="rate" class="form-control" value="0" id="rate" readonly>
-                                                    <input type="hidden" name="topay" class="form-control" value="0" id="green_tax" readonly>
+                                                    <input type="hidden" name="delivery_charges1" class="form-control" value="0" id="delivery_charges1" readonly>
+                                                    <input type="hidden" name="courier_charges1" class="form-control" value="0" id="courier_charges1" readonly>
+                                                    <input type="hidden" name="other_charges1" class="form-control" value="0" id="other_charges1" readonly>
+                                                    <input type="hidden" name="fov_charges1" class="form-control"  value="0" id="fov_charges1"  readonly>
+                                                    <input type="hidden" name="appt_charges1" class="form-control"  value="0" id="appt_charges1"  readonly>
+                                                    <input type="hidden" name="awb_charges1" class="form-control" value="0" id="awb_charges1" readonly>
+                                                    <input type="hidden" name="pickup_charges1" class="form-control" value="0" id="pickup_charges1" readonly>
+                                                    <input type="hidden" name="rate1" class="form-control" value="0" id="rate1" readonly>
+                                                    <input type="hidden" name="topay1" class="form-control" value="0" id="green_tax1" readonly>
                                                     <input type="hidden" name="booking_charges" class="form-control" value="0" id="booking_charges" readonly>                  
                                                     <input type="hidden" name="delivery_c_charges" class="form-control" value="0" id="delivery_ccharges" readonly>
                                                     <input type="hidden" name="door_delivery_charges" class="form-control" value="0" id="door_delivery_charges" readonly>
-                                                    <input type="hidden" name="amount" class="form-control" value="0" id="amount1" readonly>
-                                                    <input type="hidden" name="fuel_charges" class="form-control" value="0" id="fuel_charges1" readonly>
+                                                    <input type="hidden" name="amount1" class="form-control" value="0" id="amount1" readonly>
+                                                    <input type="hidden" name="fuel_charges1" class="form-control" value="0" id="fuel_charges1" readonly>
                                                         <br>
-                                                    <input type="hidden" name="sub_total" class="form-control" value="0" id="sub_total" readonly>
-                                                    <input type="hidden" name="cgst" class="form-control" value="0" id="cgst" readonly>
-                                                    <input type="hidden" name="sgst" class="form-control" value="0" id="sgst" readonly>
-                                                    <input type="hidden" name="igst" class="form-control" value="0" id="igst" readonly>
-                                                    <input type="hidden" name="grand_total" class="form-control" value="0" id="grand_total" readonly>
+                                                    <input type="hidden" name="sub_total1" class="form-control" value="0" id="sub_total1" readonly>
+                                                    <input type="hidden" name="cgst1" class="form-control" value="0" id="cgst1" readonly>
+                                                    <input type="hidden" name="sgst1" class="form-control" value="0" id="sgst1" readonly>
+                                                    <input type="hidden" name="igst1" class="form-control" value="0" id="igst1" readonly>
+                                                    <input type="hidden" name="grand_total1" class="form-control" value="0" id="grand_total1" readonly>
                                                     <br>
                                                     <!-- franchise Commision  -->             
                                                     <input type="hidden" name="booking_comission" class="form-control" value="0" id="booking_comission" readonly>                  
@@ -597,28 +593,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
-                                            <div class="row charges">
-                                                <div class="col-6">
-                                                <div class="form-group row" id="payby" style="display:none;">
-                                                        <label class="col-sm-2 col-form-label">Pay By<span class="compulsory_fields">*</span></label>
-                                                        <div class="col-sm-4">
-                                                            <select class="form-control" name="payment_method" id="payment_method">
-                                                                <option>-Select-</option>
-                                                                <?php foreach ($payment_method as $pm) { ?>
-                                                                        <option value="<?php echo $pm['id']; ?>"><?php echo $pm['method']; ?></option>
-                                                                <?php } ?>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="form-group row" id="Refno" style="display:none;">
-                                                        <label class="col-sm-3 col-form-label">Ref No</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" name="ref_no" class="form-control" />
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <div class="row charges">                                                                               
+                                               
                                                 <div class="col-6">
                                                     <div class="form-group row">
                                                         <label class="col-sm-3 col-form-label">Sub Total</label>
@@ -660,6 +636,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                           
                                             <div class="form-group row mt-3">
                                                 <div class="col-sm-12"  id="submit">
                                                    
@@ -751,244 +728,3 @@
   </div>
 
 <?php include (dirname(__FILE__) . '/../franchise_shared/franchise_footer.php'); ?>
-     <script src="<?php echo base_url(); ?>assets/franchise_assets/domestic_shipment.js"></script>
-      <!--<script src="assets/js/domestic_shipment.js"></script>-->
-      <Script>
-        //   $(document).ready(function(){
-           // alert('hello');
-//            $('.main').hide();
-//             $('#calculator').click(function(){
-//               $('.main').show();
-              
-
-//             });
-//             $('#close').click(function(){
-//               $('.main').hide();
-              
-
-//             });
-//             $('#input').keyup(function(){
-//               var input = $('#input').val();
-              
-//               var result = input * 2.54;
-//               // alert(result);
-//               $('#result').val(result);
-//             });
-//           });
-//         </Script>
-// 	 <script>
-
-//         $("#submit").on('click', function () {
-//             // e.preventDefault();
-//             frieht = $('#frieht').val();
-//             if(frieht){
-//                 frieht=frieht.trim();
-//                 if (frieht==0 || frieht=="") {
-//                     // alert("This Service is Not Available!");
-//                     alert("Freight Rate Required");
-//                     return false;
-//                 }
-//             }else{
-//                 alert("This Service is Not Available!");
-//                 return false;
-//             }
-
-//             $('#formSubmit').submit();
-            
-//         });
-    
-// 	     // ***************franchise persnal Details use Pincode
-//   $("#reciever_pincode").on('blur', function () 
-//   {
-//     var pincode = $(this).val();
-//     if (pincode != null || pincode != '') {
-
-    
-//       $.ajax({
-//         type: 'POST',
-//         url: '<?php echo base_url(); ?>Franchise_manager/getCityList',
-//         data: 'pincode=' + pincode,
-//         dataType: "json",
-//         success: function (d) {    
-//             // console.log(d.result2.city);     
-//           var option;         
-//           option += '<option value="' + d.id + '">' + d.city + '</option>';
-//           $('#reciever_city').html(option);
-          
-//         }
-//       });
-//       $.ajax({
-//         type: 'POST',
-//         url: '<?php echo base_url(); ?>Franchise_manager/getState',
-//         data: 'pincode=' + pincode,
-//         dataType: "json",
-//         success: function (d) {         
-//           var option;         
-//           option += '<option value="' + d.result3.id + '">' + d.result3.state + '</option>';
-//           $('#reciever_state').html(option);          
-//           var oda = '';         
-//           oda += '<span style="color:red;">Service Type : '+d.oda+'</span>';
-//           $('#oda').html(oda);          
-//         },
-//         error: function () {
-// 					$('#oda').html('<p>Service Not Available</p>');	
-// 				}
-//       });
-//     }
-//   }); 
-
-
-//   $("#reciever_state, #reciever_city").blur(function () 
-// 	{
-// 		var reciever_state =$("#reciever_state").val();
-// 		var reciever_city =$("#reciever_city").val();
-
-//       $.ajax({
-//         type: 'POST',
-//         url: '<?php echo base_url(); ?>Franchise_manager/getZone',
-//         data: {reciever_city:reciever_city,reciever_state:reciever_state},
-//         dataType: "json",
-//         success: function (d) {         
-//                     $("#receiver_zone_id").val(d.region_id);						
-// 					$("#receiver_zone1").val(d.region_name);	
-          
-//         }
-//       });
-    
-// }); 
-
-
-
-
-// //   alert('hello');
-// //  $("#volumetric_table").hide();
-//  $('#fov_charges').hide();
-
-// 	$("#risk_type").change(function () 
-// 	{
-// 		var risk_type = $(this).val();
-// 		if(risk_type=='Carrier'){
-// 		    $('#fov_charges').show();
-// 		}else{
-// 		    $('#fov_charges').hide();
-// 		}
-
-// 	});
-// 	 $('#submit').hide();
-// 	$("#sub_total").blur(function (){
-// 	      var frieht = $('#sub_total').val();
-     
-//     if (frieht == '0' || frieht=='') {
-//         $('#submit').hide();
-//     }else{
-//         $('#submit').show();
-//     }
-// 	});
-// 	$("#amount").blur(function (){
-// 	      var frieht = $('#amount').val();
-     
-//     if (frieht == '0' || frieht=='') {
-//         $('#submit').hide();
-//     }else{
-//         $('#submit').show();
-//     }
-// 	});
-    
-     
-// 	$("#frieht").blur(function (){
-// 	      var frieht = $('#frieht').val();
-     
-//     if (frieht == '0' || frieht=='') {
-//         $('#submit').hide();
-//     }else{
-//         $('#submit').show();
-//     }
-// 	});
-
-    
-    
-// 	//customer
-// 		$("#customer_account_id").change(function () 
-// 	{
-// 		var customer_name = $(this).val();
-// 	//	alert(customer_name);
-// 		if (customer_name != null || customer_name != '') 
-// 		{
-// 			$.ajax({
-// 				type: 'POST',
-// 				dataType: "json",
-// 				url: '<?php echo base_url(); ?>Franchise_manager/getsenderdetails',
-// 				data: 'customer_name=' + customer_name,
-// 				success: function (data) 
-// 				{
-// 					$("#sender_name").val(data.user.customer_name);
-// 					$("#sender_address").val(data.user.address);
-// 					$("#sender_pincode").val(data.user.pincode);
-// 					$("#sender_contactno").val(data.user.phone);
-// 					$("#sender_gstno").val(data.user.gstno);
-// 					$("#gst_charges").val(data.user.gst_charges);
-// 					// $("#sender_city").val(data.user.city);
-// 					// $("#sender_state").val(data.user.state);					
-// 					$("#customer_account_id").val(customer_name);
-
-// 					 var option;					
-// 					 option += '<option value="' + data.user.city_id + '">' + data.user.city_name + '</option>';
-// 					$('#sender_city').html(option);
-
-// 					 var option1;					
-// 					 option1 += '<option value="' + data.user.state_id + '">' + data.user.state_name + '</option>';
-// 					$('#sender_state').html(option1);
-// 					var dispatch_details =$("#dispatch_details").val();
-                
-// 					document.getElementById("reciever").focus();								
-// 				}
-// 			});
-// 		}
-// 	});
-// 	document.addEventListener('contextmenu', function(e) {
-//   e.preventDefault();
-// });
-// 		// chkceing duplicate number
-//         $("#pod").on({
-//             keydown: function(e) {
-//                 if (e.which === 32)
-//                 return false;
-//             },
-//             change: function() {
-//                 this.value = this.value.replace(/\s/g, "");
-//             }
-//         });
-//         $("#pod").blur(function () {        
-//         var pod_no = $(this).val().toUpperCase();
-//         if (pod_no != null || pod_no != '') {
-//             $.ajax({
-//                 type: 'POST',
-//                 dataType: "json",
-//                 url: '<?php echo base_url(); ?>Franchise_manager/check_duplicate_awb_no',
-//                 data: 'pod_no=' + pod_no,
-//                 success: function (data) {
-//                     if(data.msg!=""){       
-//                     		//  $('#awn').focus();
-//                     		 $('#pod').val("");
-//                     		 alert(data.msg);
-//                     }else{
-//                         if(data.mode != ""){
-//                     		var data1 = '';
-//                     		data1 += '<option value="'+data.mode.transfer_mode_id+'">'+data.mode.mode_name+'</option>';
-//                     		// $("#mode_dispatch").html(data1);
-//                     	}else{
-//                             // $('#awn').focus(); 
-//                     		 $('#pod').val("");
-//                     		//  alert("This AWB Not In Stock");
-//                     		 alert("This AWB No. is not in allocated range "+data.from+" to "+data.to+"");
-//                         }
-//                     }
-                    
-//                 }
-//             });
-//         }
-//     });
-    
-
-     </script>
-    

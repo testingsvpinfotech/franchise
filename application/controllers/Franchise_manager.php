@@ -386,49 +386,36 @@ class Franchise_manager extends CI_Controller
 	}
 	public function add_shipment()
 	{
-
 		$all_Data = $this->input->post();
-		// echo "<pre>";
-		// print_r($all_Data);exit();
-
-
 		if (!empty($all_Data)) {
-
-
 			$user_id = $this->session->userdata("customer_id");
 			$gat_area = $this->db->query("select cmp_area from tbl_franchise where fid = '$user_id'")->row();
 			$area = $gat_area->cmp_area;
 			$cutomer = $this->session->userdata("customer_name");
 			$branch = $this->session->userdata("branch_name");
-
-			// $branch_name = $branch . " " .$area. "Franchise";
 			if(!empty($area)){
 				$branch_name = $branch . "_" . $area;
 			}else
 			{
 				$branch_name = $branch;
 			}
-
-			//print_r($branch_name);
-			//print_r($this->session->all_userdata());
-			//exit;
-
-
-
-
+			if($_SESSION['franchise_type']== 1 || $_SESSION['franchise_type'] ==3){
+                 if(!empty($all_Data['customer_id']) && $all_Data['company_customer']==1){
+					$this->CustomerBNF_insert($all_Data);
+					exit();
+				 }
+			}
+		    // print_r($_POST);die;
+		 
 			$user_type = $this->session->userdata("customer_type");
-
 			$balance = $this->db->query("Select * from tbl_customers where customer_id = '$user_id'")->row();
 			$amount = $balance->wallet;
-			$update_val = $amount - $this->input->post('grand_total');
-
+			$update_val = $amount - $this->input->post('grand_total');			
 			if ($update_val < 0) {
 				$msg = 'You Dont Have sufficient Balance!';
 				$class = 'alert alert-danger alert-dismissible';
 				$this->session->set_flashdata('notify', $msg);
 				$this->session->set_flashdata('class', $class);
-
-
 				redirect('franchise/shipment-list');
 			}
 			if($this->input->post('doc_type')=='1'){
@@ -437,56 +424,22 @@ class Franchise_manager extends CI_Controller
 				$class = 'alert alert-danger alert-dismissible';
 				$this->session->set_flashdata('notify', $msg);
 				$this->session->set_flashdata('class', $class);
-
-
 				redirect('franchise/shipment-list');
 			}
 		   } 
 			$date = date('Y-m-d', strtotime($this->input->post('booking_date')));
 			$this->session->unset_userdata("booking_date");
 			$this->session->set_userdata("booking_date", $this->input->post('booking_date'));
-
 			$whr = array('customer_id' => $user_id);
 			$res = $this->basic_operation_m->getAll('tbl_customers', $whr);
 			$branch_id = $res->row()->branch_id;
 			$awb = $this->input->post('awn');
-
-
-			// $branch_id =23;
-
 			if ($all_Data['doc_type'] == 0) {
 				$doc_nondoc = 'Document';
 			} else {
 				$doc_nondoc = 'Non Document';
 			}
-
-
-			$pickup_charges = $this->input->post('pickup_charges');
-			if (empty($pickup_charges)) {
-				$pickup_charges = 0;
-			}
-			$green_tax = $this->input->post('green_tax');
-			if (empty($green_tax)) {
-				$green_tax = 0;
-			}
-			$appt_charges = $this->input->post('appt_charges');
-			if (empty($appt_charges)) {
-				$appt_charges = 0;
-			}
-			$insurance_charges = $this->input->post('insurance_charges');
-			if (empty($insurance_charges)) {
-				$insurance_charges = 0;
-			}
-			$transportation_charges = $this->input->post('transportation_charges');
-			if (empty($transportation_charges)) {
-				$transportation_charges = 0;
-			}
-			$other_charges = $this->input->post('other_charges');
-			if (empty($other_charges)) {
-				$other_charges = 0;
-			}
 			if (empty(strtoupper($this->input->post('awn')))) {
-
 				$customer_id = $_SESSION['customer_id'];
 				$readonly = $this->db->query("SELECT * FROM tbl_branch_assign_cnode WHERE customer_id = '$customer_id'")->row();
 				if (!empty($readonly)) {
@@ -543,47 +496,41 @@ class Franchise_manager extends CI_Controller
 				'receiver_zone' => $this->input->post('receiver_zone'),
 				'receiver_zone_id' => $this->input->post('receiver_zone_id'),
 				'receiver_gstno' => $this->input->post('receiver_gstno'),
-				'ref_no' => $this->input->post('ref_no'),
 				'invoice_no' => $this->input->post('invoice_no'),
 				'invoice_value' => $this->input->post('invoice_value'),
 				'eway_no' => $this->input->post('eway_no'),
 				'eway_expiry_date' => $this->input->post('eway_expiry_date'),
 				'special_instruction' => $this->input->post('special_instruction'),
-
 				'booking_date' => $date,
 				'booking_time' => date('H:i:s', strtotime($this->input->post('booking_date'))),
 				'dispatch_details' => $this->input->post('dispatch_details'),
 				// 'delivery_date' => $this->input->post('delivery_date'),
-				'payment_method' => $this->input->post('payment_method'),
-				'frieht' => $this->input->post('frieht'),
-				'transportation_charges' => $transportation_charges,
-				'insurance_charges' => $insurance_charges,
-				'pickup_charges' => $pickup_charges,
-				'delivery_charges' => $this->input->post('delivery_charges'),
-				'courier_charges' => $this->input->post('courier_charges'),
-				'awb_charges' => $this->input->post('awb_charges'),
-				'other_charges' => $other_charges,
-				'total_amount' => $this->input->post('amount'),
-				'fuel_subcharges' => $this->input->post('fuel_subcharges'),
-				'sub_total' => $this->input->post('sub_total'),
-				'cgst' => $this->input->post('cgst'),
-				'sgst' => $this->input->post('sgst'),
-				'igst' => $this->input->post('igst'),
-				'green_tax' => $green_tax,
-				'appt_charges' => $appt_charges,
-				'grand_total' => $this->input->post('grand_total'),
+				'frieht' => EmptyVal($this->input->post('frieht')),
+				'transportation_charges' => EmptyVal($this->input->post('transportation_charges')),
+				'insurance_charges' => EmptyVal($this->input->post('insurance_charges')),
+				'pickup_charges' => EmptyVal($this->input->post('pickup_charges')),
+				'delivery_charges' => EmptyVal($this->input->post('delivery_charges')),
+				'courier_charges' => EmptyVal($this->input->post('courier_charges')),
+				'awb_charges' => EmptyVal($this->input->post('awb_charges')),
+				'other_charges' => EmptyVal($this->input->post('other_charges')),
+				'total_amount' => EmptyVal($this->input->post('amount')),
+				'fuel_subcharges' => EmptyVal($this->input->post('fuel_subcharges')),
+				'sub_total' => EmptyVal($this->input->post('sub_total')),
+				'cgst' => EmptyVal($this->input->post('cgst')),
+				'sgst' => EmptyVal($this->input->post('sgst')),
+				'igst' => EmptyVal($this->input->post('igst')),
+				'green_tax' => EmptyVal($this->input->post('green_tax')),
+				'appt_charges' => EmptyVal($this->input->post('appt_charges')),
+				'grand_total' => EmptyVal($this->input->post('grand_total')),
 				'user_id' => $user_id,
 				'user_type' => $user_type,
 				'branch_id' => 0,
 				'booking_type' => 1
 			);
-
-
-
 			//echo '<pre>'; print_r($data);exit;
 			$this->db->trans_start();
 			$result = $this->db->insert('tbl_domestic_booking', $data);
-
+            // echo $this->db->last_query();die;
 			$all_Data = $this->input->post();
 
 
@@ -593,10 +540,7 @@ class Franchise_manager extends CI_Controller
 				$data['error'][] = "Already Exist " . $this->input->post('awn') . '<br>';
 			} else {
 				$lastid = $this->db->insert_id();
-
-
 				// echo "<pre>";
-
 				$weight_data = array(
 					'per_box_weight_detail' => $all_Data['per_box_weight_detail'],
 					'length_detail' => $all_Data['length_detail'],
@@ -613,10 +557,7 @@ class Franchise_manager extends CI_Controller
 					'valumetric_actual' => $all_Data['valumetric_actual'],
 					'valumetric_chageable' => $all_Data['valumetric_chageable'],
 				);
-
 				$weight_details = json_encode($weight_data);
-
-
 				$data2 = array(
 					'booking_id' => $lastid,
 					'actual_weight' => $this->input->post('actual_weight'),
@@ -637,14 +578,9 @@ class Franchise_manager extends CI_Controller
 					'per_box_weight_detail' => json_encode($this->input->post('per_box_weight_detail[]')),
 					'weight_details' => $weight_details,
 				);
-
-				
-
 				$query2 = $this->basic_operation_m->insert('tbl_domestic_weight_details', $data2);
 				// echo $this->db->last_query();exit;
 				$username = $this->session->userdata("customer_id");		
-
-
 				$whr = array('booking_id' => $lastid);
 				$res = $this->basic_operation_m->getAll('tbl_domestic_booking', $whr);
 				$podno = $res->row()->pod_no;
@@ -663,9 +599,6 @@ class Franchise_manager extends CI_Controller
 					'is_delhivery_b2b' => ($data['forworder_name'] == 'delhivery_b2b') ? 1 : 0,
 					'is_delhivery_c2c' => ($data['forworder_name'] == 'delhivery_c2c') ? 1 : 0
 				);
-				// print_r($data3);
-				// exit;
-
 				$result3 = $this->basic_operation_m->insert('tbl_domestic_tracking', $data3);
 				// echo $this->db->last_query();die;
 				if ($this->input->post('customer_account_id') != "") {
@@ -674,10 +607,7 @@ class Franchise_manager extends CI_Controller
 					$email = $res->row()->email;
 				}
 			}
-
 			if (!empty($result)) {
-
-
 				$query = "SELECT MAX(topup_balance_id) as id FROM franchise_topup_balance_tbl ";
 				$result1 = $this->basic_operation_m->get_query_row($query);
 				$id = $result1->id + 1;
@@ -698,8 +628,6 @@ class Franchise_manager extends CI_Controller
 				} elseif (strlen($id) == 5) {
 					$franchise_id = 'BFT1000' . $id;
 				}
-
-
 				if ($this->input->post('grand_total') != '') {
 					//$value = $_SESSION['customer_id'];
 					$value = $this->session->userdata('customer_id');
@@ -710,14 +638,8 @@ class Franchise_manager extends CI_Controller
 					$whr5 = array('customer_id' => $_SESSION['customer_id']);
 					$data1 = array('wallet' => $update_val);
 					$result = $this->basic_operation_m->update('tbl_customers', $data1, $whr5);
-
-
-
 					$franchise_id1 = $balance->cid;
-					//print_r($update_val);exit;
-
-					$data9 = array(
-
+						$data9 = array(
 						'franchise_id' => $franchise_id1,
 						'customer_id' => $user_id,
 						'transaction_id' => $franchise_id,
@@ -729,17 +651,9 @@ class Franchise_manager extends CI_Controller
 						'status' => 1,
 						'refrence_no' => $pod_no
 					);
-
-					//echo '<pre>'; print_r($data9);exit;
-
 					$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
-
 				}
-
-
-				
 			}
-
 			$this->db->trans_complete();
 			if ($this->db->trans_status() === TRUE)
 			{
@@ -753,45 +667,338 @@ class Franchise_manager extends CI_Controller
 				$msg = 'Shipment not added successfully';
 				$class = 'alert alert-danger alert-dismissible';
 			}
-
 			$this->session->set_flashdata('notify', $msg);
 			$this->session->set_flashdata('class', $class);
 			redirect('franchise/shipment-list');
 		} else {
+			// Add shipment case 
 			$data = array();
-
-			$result = $this->db->query('select max(booking_id) AS id from tbl_domestic_booking')->row();
-			$id = $result->id + 1;
-			//  print_r($id);exit;
-			if (strlen($id) == 2) {
-				$id = 'FBI1000' . $id;
-			} elseif (strlen($id) == 3) {
-				$id = 'FBI100' . $id;
-			} elseif (strlen($id) == 1) {
-				$id = 'FBI10000' . $id;
-			} elseif (strlen($id) == 4) {
-				$id = 'FBI10' . $id;
-			} elseif (strlen($id) == 5) {
-				$id = 'FBI1' . $id;
-			}
-
-
-			$data['transfer_mode'] = $this->basic_operation_m->get_query_result('select * from `transfer_mode`');
-
+			$data['transfer_mode'] = $this->basic_operation_m->get_query_result('select * from `transfer_mode`'); // mode
 			$customer_id = $this->session->userdata("customer_id");
 			$data['cities'] = $this->basic_operation_m->get_all_result('city', '');
 			$data['states'] = $this->basic_operation_m->get_all_result('state', '');
-
 			$data['franchise'] = $this->basic_operation_m->get_all_result('tbl_customers', "customer_id = '$customer_id'");
 			$data['customers'] = $this->db->query("SELECT * FROM tbl_customers WHERE franchise_id = '$customer_id' AND (customer_type !='1' OR customer_type !='2') ")->result_array();
-
-			$data['payment_method'] = $this->basic_operation_m->get_all_result('payment_method', '');
-			$data['region_master'] = $this->basic_operation_m->get_all_result('region_master', '');
-			$data['bid'] = $id;
-			$whr_d = array("company_type" => "Domestic");
-			$data['courier_company'] = $this->basic_operation_m->get_all_result("courier_company", $whr_d);
-			$data['bid'] = $id;
 			$this->load->view('franchise/booking_master/add_shipment', $data);
+		}
+	}
+	public function CustomerBNF_insert($all_Data)
+	{
+		if (!empty($all_Data)) {			
+			$user_id = $this->session->userdata("customer_id");
+			$gat_area = $this->db->query("select cmp_area from tbl_franchise where fid = '$user_id'")->row();
+			$area = $gat_area->cmp_area;
+			$cutomer = $this->session->userdata("customer_name");
+			$branch = $this->session->userdata("branch_name");
+			if(!empty($area)){
+				$branch_name = $branch . "_" . $area;
+			}else
+			{
+				$branch_name = $branch;
+			}         
+			$user_type = $this->session->userdata("customer_type");
+			$balance = $this->db->query("Select * from tbl_franchise where fid = '$user_id'")->row();
+			$credit_limit = $balance->credit_limit;
+			$amount = $balance->credit_limit_utilize;
+			$update_val = $amount + $this->input->post('grand_total1');
+			if ($credit_limit < $update_val) {
+				$msg = 'You Dont Have sufficient Credit Limit Balance!';
+				$class = 'alert alert-danger alert-dismissible';
+				$this->session->set_flashdata('notify', $msg);
+				$this->session->set_flashdata('class', $class);
+				redirect('franchise/shipment-list');
+			}
+			if($this->input->post('doc_type')=='1'){
+			if (empty($this->input->post('invoice_value'))) {
+				$msg = 'Invoice Value Must be required';
+				$class = 'alert alert-danger alert-dismissible';
+				$this->session->set_flashdata('notify', $msg);
+				$this->session->set_flashdata('class', $class);
+				redirect('franchise/shipment-list');
+			}
+		   } 
+			$date = date('Y-m-d', strtotime($this->input->post('booking_date')));
+			$this->session->unset_userdata("booking_date");
+			$this->session->set_userdata("booking_date", $this->input->post('booking_date'));
+			$whr = array('customer_id' => $user_id);
+			$res = $this->basic_operation_m->getAll('tbl_customers', $whr);
+			$branch_id = $res->row()->branch_id;
+			$awb = $this->input->post('awn');
+			if ($all_Data['doc_type'] == 0) {
+				$doc_nondoc = 'Document';
+			} else {
+				$doc_nondoc = 'Non Document';
+			}
+	
+			if (empty(strtoupper($this->input->post('awn')))) {
+				$customer_id = $_SESSION['customer_id'];
+				$readonly = $this->db->query("SELECT * FROM tbl_branch_assign_cnode WHERE customer_id = '$customer_id'")->row();
+				if (!empty($readonly)) {
+					$msg = 'Booking Not Allowed AWB No. is not allocated range';
+					$class = 'alert alert-danger alert-dismissible';
+					$this->session->set_flashdata('notify', $msg);
+					$this->session->set_flashdata('class', $class);
+					redirect('franchise/shipment-list');
+				} else {
+					$result = $this->db->query('select max(booking_id) AS id from tbl_domestic_booking')->row();
+					$id = $result->id + 1;
+					//  print_r($id);exit;
+					if (strlen($id) == 2) {
+						$id = 'FBI1000' . $id;
+					} elseif (strlen($id) == 3) {
+						$id = 'FBI100' . $id;
+					} elseif (strlen($id) == 1) {
+						$id = 'FBI10000' . $id;
+					} elseif (strlen($id) == 4) {
+						$id = 'FBI10' . $id;
+					} elseif (strlen($id) == 5) {
+						$id = 'FBI1' . $id;
+					}
+					$pod_no = $id;
+				}
+			} else {
+				$pod_no = strtoupper($this->input->post('awn'));
+			}
+
+			// echo '<pre>';print_r($_POST);die;
+			$data = array(
+				'doc_type' => $this->input->post('doc_type'),
+				'doc_nondoc' => $doc_nondoc,
+				'courier_company_id' => $this->input->post('courier_company'),
+				'company_type' => 'Domestic',
+				'mode_dispatch' => $this->input->post('mode_dispatch'),
+				'pod_no' => $pod_no,
+				'forworder_name' => "SELF",
+				'risk_type' => $this->input->post('risk_type'),
+				'bnf_customer_id' => EmptyVal($this->input->post('customer_id')),
+				'customer_id' => $user_id,
+				'sender_name' => $this->input->post('sender_name'),
+				'sender_address' => $this->input->post('sender_address'),
+				'sender_city' => $this->input->post('sender_city'),
+				'sender_state' => $this->input->post('sender_state'),
+				'sender_pincode' => $this->input->post('sender_pincode'),
+				'sender_contactno' => $this->input->post('sender_contactno'),
+				'sender_gstno' => $this->input->post('sender_gstno'),
+				'reciever_name' => $this->input->post('reciever_name'),
+				'contactperson_name' => $this->input->post('contactperson_name'),
+				'reciever_address' => $this->input->post('reciever_address'),
+				'reciever_contact' => $this->input->post('reciever_contact'),
+				'reciever_pincode' => $this->input->post('reciever_pincode'),
+				'reciever_city' => $this->input->post('reciever_city'),
+				'reciever_state' => $this->input->post('reciever_state'),
+				'receiver_zone' => $this->input->post('receiver_zone'),
+				'receiver_zone_id' => $this->input->post('receiver_zone_id'),
+				'receiver_gstno' => $this->input->post('receiver_gstno'),
+				'is_appointment' => EmptyVal($this->input->post('is_appointment')),
+				'invoice_no' => $this->input->post('invoice_no'),
+				'invoice_value' => $this->input->post('invoice_value'),
+				'eway_no' => $this->input->post('eway_no'),
+				'eway_expiry_date' => $this->input->post('eway_expiry_date'),
+				'special_instruction' => $this->input->post('special_instruction'),
+				'booking_date' => $date,
+				'booking_time' => date('H:i:s', strtotime($this->input->post('booking_date'))),
+				'dispatch_details' => $this->input->post('dispatch_details'),
+				'rate' => EmptyVal($this->input->post('rate')),
+				'frieht' => EmptyVal($this->input->post('frieht')),
+				'transportation_charges' => EmptyVal($this->input->post('transportation_charges1')),
+				'insurance_charges' => EmptyVal($this->input->post('insurance_charges1')),
+				'pickup_charges' => EmptyVal($this->input->post('pickup_charges1')),
+				'delivery_charges' => EmptyVal($this->input->post('delivery_charges1')),
+				'courier_charges' => EmptyVal($this->input->post('courier_charges1')),
+				'awb_charges' => EmptyVal($this->input->post('awb_charges1')),
+				'other_charges' => EmptyVal($this->input->post('other_charges1')),
+				'total_amount' => EmptyVal($this->input->post('amount1')),
+				'fuel_subcharges' => EmptyVal($this->input->post('fuel_charges1')),
+				'fov_charges' => EmptyVal($this->input->post('fov_charges1')),
+				'sub_total' => EmptyVal($this->input->post('sub_total1')),
+				'cgst' => EmptyVal($this->input->post('cgst1')),
+				'sgst' => EmptyVal($this->input->post('sgst1')),
+				'igst' => EmptyVal($this->input->post('igst1')),
+				'green_tax' => EmptyVal($this->input->post('topay1')),
+				'appt_charges' => EmptyVal($this->input->post('appt_charges1')),
+				'grand_total' => EmptyVal($this->input->post('grand_total1')),
+				'user_id' => $user_id,
+				'user_type' => $user_type,
+				'branch_id' => 0,
+				'booking_type' => 1
+			);
+			// echo '<pre>'; print_r($_POST);
+			// echo '<pre>'; print_r($data);exit;
+			$this->db->trans_start();
+			$result = $this->db->insert('tbl_domestic_booking', $data);
+            // echo $this->db->last_query();die;
+			$all_Data = $this->input->post();
+
+
+			$lastid = $this->db->insert_id();
+			if (empty($lastid)) {
+
+				$data['error'][] = "Already Exist " . $this->input->post('awn') . '<br>';
+			} else {
+				$lastid = $this->db->insert_id();
+				// echo "<pre>";
+				$total_charges = EmptyVal($this->input->post('booking_charges')) + EmptyVal($this->input->post('delivery_c_charges')) + EmptyVal($this->input->post('door_delivery_charges'));
+				$commision = [
+					'booking_id'=>$lastid,
+					'franchise_id'=>$_SESSION['customer_id'],
+					'customer_id'=>EmptyVal($this->input->post('customer_id')),
+					'pod_no'=>$pod_no,
+					'booking_commision'=>EmptyVal($this->input->post('booking_comission')),
+					'delivery_commision'=>EmptyVal($this->input->post('delivery_commission')),
+					'door_delivery_share'=>EmptyVal($this->input->post('door_delivery_share')),
+					'booking_commision_charges'=>EmptyVal($this->input->post('booking_charges')),
+					'delivery_commision_charges'=>EmptyVal($this->input->post('delivery_c_charges')),
+					'door_delivery_charges'=>EmptyVal($this->input->post('door_delivery_charges')),
+					'total_charges'=>$total_charges,
+					'booking_date'=>$date
+				];
+				if(!empty($this->input->post('booking_charges'))){
+					$commision['booking_commision_access']= 1;
+				}
+				if(!empty($this->input->post('delivery_c_charges'))){
+					$commision['delivery_commision_access']= 1;
+				}
+				if(!empty($this->input->post('door_delivery_charges'))){
+					$commision['door_delivery_access']= 1;
+				}				
+				$this->basic_operation_m->insert('tbl_franchise_comission', $commision);
+
+				$weight_data = array(
+					'per_box_weight_detail' => $all_Data['per_box_weight_detail'],
+					'length_detail' => $all_Data['length_detail'],
+					'breath_detail' => $all_Data['breath_detail'],
+					'height_detail' => $all_Data['height_detail'],
+					'valumetric_weight_detail' => $all_Data['valumetric_weight_detail'],
+					'valumetric_actual_detail' => $all_Data['valumetric_actual_detail'],
+					'valumetric_chageable_detail' => $all_Data['valumetric_chageable_detail'],
+					'per_box_weight' => $all_Data['per_box_weight'],
+					'length' => $all_Data['length'],
+					'breath' => $all_Data['breath'],
+					'height' => $all_Data['height'],
+					'valumetric_weight' => $all_Data['valumetric_weight'],
+					'valumetric_actual' => $all_Data['valumetric_actual'],
+					'valumetric_chageable' => $all_Data['valumetric_chageable'],
+				);
+				$weight_details = json_encode($weight_data);
+				$data2 = array(
+					'booking_id' => $lastid,
+					'actual_weight' => $this->input->post('actual_weight'),
+					'valumetric_weight' => $this->input->post('valumetric_weight'),
+					'length' => $this->input->post('length'),
+					'breath' => $this->input->post('breath'),
+					'height' => $this->input->post('height'),
+					'chargable_weight' => $this->input->post('chargable_weight'),
+					'per_box_weight' => $this->input->post('per_box_weight'),
+					'no_of_pack' => $this->input->post('no_of_pack'),
+					'actual_weight_detail' => json_encode($this->input->post('actual_weight')),
+					'valumetric_weight_detail' => json_encode($this->input->post('valumetric_weight_detail[]')),
+					'chargable_weight_detail' => json_encode($this->input->post('chargable_weight')),
+					'length_detail' => json_encode($this->input->post('length_detail[]')),
+					'breath_detail' => json_encode($this->input->post('breath_detail[]')),
+					'height_detail' => json_encode($this->input->post('height_detail[]')),
+					'no_pack_detail' => json_encode($this->input->post('no_of_pack')),
+					'per_box_weight_detail' => json_encode($this->input->post('per_box_weight_detail[]')),
+					'weight_details' => $weight_details,
+				);
+				$query2 = $this->basic_operation_m->insert('tbl_domestic_weight_details', $data2);
+				// echo $this->db->last_query();exit;
+				$username = $this->session->userdata("customer_id");		
+				$whr = array('booking_id' => $lastid);
+				$res = $this->basic_operation_m->getAll('tbl_domestic_booking', $whr);
+				$podno = $res->row()->pod_no;
+				$customerid = $res->row()->customer_id;
+				$data3 = array(
+					'id' => '',
+					'pod_no' => $pod_no,
+					'status' => 'Booked',
+					'branch_name' => $branch_name,
+					'tracking_date' => $this->input->post('booking_date'),
+					'remarks' => $this->input->post('special_instruction'),
+					'booking_id' => $lastid,
+					'forworder_name' => $data['forworder_name'],
+					'forwording_no' => $data['forwording_no'],
+					'is_spoton' => ($data['forworder_name'] == 'spoton_service') ? 1 : 0,
+					'is_delhivery_b2b' => ($data['forworder_name'] == 'delhivery_b2b') ? 1 : 0,
+					'is_delhivery_c2c' => ($data['forworder_name'] == 'delhivery_c2c') ? 1 : 0
+				);
+				$result3 = $this->basic_operation_m->insert('tbl_domestic_tracking', $data3);
+				// echo $this->db->last_query();die;
+				if ($this->input->post('customer_account_id') != "") {
+					$whr = array('customer_id' => $customerid);
+					$res = $this->basic_operation_m->getAll('tbl_customers', $whr);
+					$email = $res->row()->email;
+				}
+			}
+			if (!empty($result)) {
+				$query = "SELECT MAX(topup_balance_id) as id FROM franchise_topup_balance_tbl ";
+				$result1 = $this->basic_operation_m->get_query_row($query);
+				$id = $result1->id + 1;
+				//print_r($id); exit;
+
+				$franchise_id1 = $balance->franchise_id;
+				$payment_mode = 'Debit';
+				$bank_name = 'Current';
+
+				if (strlen($id) == 1) {
+					$franchise_id = 'BFT100000' . $id;
+				} elseif (strlen($id) == 2) {
+					$franchise_id = 'BFT10000' . $id;
+				} elseif (strlen($id) == 3) {
+					$franchise_id = 'BFT1000' . $id;
+				} elseif (strlen($id) == 4) {
+					$franchise_id = 'BFT100' . $id;
+				} elseif (strlen($id) == 5) {
+					$franchise_id = 'BFT1000' . $id;
+				}
+				if ($this->input->post('grand_total1') != '') {
+					//$value = $_SESSION['customer_id'];
+					$value = $this->session->userdata('customer_id');
+					$g_total = $this->input->post('grand_total1');
+					$balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
+					$amount = $balance->credit_limit_utilize;
+					$update_val = $amount + $this->input->post('grand_total1');
+					$whr5 = array('fid' => $_SESSION['customer_id']);
+					$data1 = array('credit_limit_utilize' => $update_val);
+					$result = $this->basic_operation_m->update('tbl_franchise', $data1, $whr5);
+					$franchise_id1 = $balance->cid;
+						$data9 = array(
+						'franchise_id' => $franchise_id1,
+						'customer_id' => $user_id,
+						'transaction_id' => $franchise_id,
+						'payment_date' => $date,
+						'debit_amount' => $g_total,
+						'balance_amount' => $update_val,
+						'payment_mode' => $payment_mode,
+						'bank_name' => $bank_name,
+						'status' => 1,
+						'franchise_type' =>$_SESSION['franchise_type'] ,
+						'refrence_no' => $pod_no
+					);
+					$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
+				}
+			}
+			$this->db->trans_complete();
+			if ($this->db->trans_status() === TRUE)
+			{
+				$this->db->trans_commit();
+				$msg = 'Your Shipment ' . $podno . ' status:Boked  At Location: ' . $branch_name;
+				$class = 'alert alert-success alert-dismissible';
+			}
+			else
+			{
+				$this->db->trans_rollback();	
+				$msg = 'Shipment not added successfully';
+				$class = 'alert alert-danger alert-dismissible';
+			}
+			$this->session->set_flashdata('notify', $msg);
+			$this->session->set_flashdata('class', $class);
+			redirect('franchise/shipment-list');
+		} else {
+			$msg = 'Shipment not added successfully';
+			$class = 'alert alert-danger alert-dismissible';
+			$this->session->set_flashdata('notify', $msg);
+			$this->session->set_flashdata('class', $class);
+			redirect('franchise/shipment-list');
 		}
 	}
 

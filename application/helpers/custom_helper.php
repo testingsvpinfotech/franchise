@@ -80,6 +80,13 @@ function displaywords($number){
   }
 }
 
+function EmptyVal($val){
+    if(!empty($val)){
+       return $val;
+    }else{
+       return 0;
+    }
+}
 function mis_formate_columns($type){
   
   if($type == '1')
