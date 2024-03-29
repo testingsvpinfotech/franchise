@@ -826,7 +826,7 @@ class Franchise_manager extends CI_Controller
 			// echo '<pre>'; print_r($data);exit;
 			$this->db->trans_start();
 			$result = $this->db->insert('tbl_domestic_booking', $data);
-            // echo $this->db->last_query();die;
+          
 			$all_Data = $this->input->post();
 
 
@@ -862,7 +862,7 @@ class Franchise_manager extends CI_Controller
 					$commision['door_delivery_access']= 1;
 				}				
 				$this->basic_operation_m->insert('tbl_franchise_comission', $commision);
-
+				
 				$weight_data = array(
 					'per_box_weight_detail' => $all_Data['per_box_weight_detail'],
 					'length_detail' => $all_Data['length_detail'],
@@ -902,27 +902,26 @@ class Franchise_manager extends CI_Controller
 				);
 				$query2 = $this->basic_operation_m->insert('tbl_domestic_weight_details', $data2);
 				// echo $this->db->last_query();exit;
+			
 				$username = $this->session->userdata("customer_id");		
 				$whr = array('booking_id' => $lastid);
 				$res = $this->basic_operation_m->getAll('tbl_domestic_booking', $whr);
 				$podno = $res->row()->pod_no;
 				$customerid = $res->row()->customer_id;
 				$data3 = array(
-					'id' => '',
 					'pod_no' => $pod_no,
 					'status' => 'Booked',
 					'branch_name' => $branch_name,
 					'tracking_date' => $this->input->post('booking_date'),
 					'remarks' => $this->input->post('special_instruction'),
 					'booking_id' => $lastid,
-					'forworder_name' => $data['forworder_name'],
-					'forwording_no' => $data['forwording_no'],
 					'is_spoton' => ($data['forworder_name'] == 'spoton_service') ? 1 : 0,
 					'is_delhivery_b2b' => ($data['forworder_name'] == 'delhivery_b2b') ? 1 : 0,
 					'is_delhivery_c2c' => ($data['forworder_name'] == 'delhivery_c2c') ? 1 : 0
 				);
 				$result3 = $this->basic_operation_m->insert('tbl_domestic_tracking', $data3);
 				// echo $this->db->last_query();die;
+				
 				if ($this->input->post('customer_account_id') != "") {
 					$whr = array('customer_id' => $customerid);
 					$res = $this->basic_operation_m->getAll('tbl_customers', $whr);
@@ -954,13 +953,15 @@ class Franchise_manager extends CI_Controller
 					//$value = $_SESSION['customer_id'];
 					$value = $this->session->userdata('customer_id');
 					$g_total = $this->input->post('grand_total1');
-					$balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
+					$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
+					$cust = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
 					$amount = $balance->credit_limit_utilize;
 					$update_val = $amount + $this->input->post('grand_total1');
 					$whr5 = array('fid' => $_SESSION['customer_id']);
 					$data1 = array('credit_limit_utilize' => $update_val);
 					$result = $this->basic_operation_m->update('tbl_franchise', $data1, $whr5);
-					$franchise_id1 = $balance->cid;
+				
+					$franchise_id1 = $cust->cid;
 						$data9 = array(
 						'franchise_id' => $franchise_id1,
 						'customer_id' => $user_id,
@@ -975,6 +976,7 @@ class Franchise_manager extends CI_Controller
 						'refrence_no' => $pod_no
 					);
 					$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
+					// echo $this->db->last_query();die;
 				}
 			}
 			$this->db->trans_complete();
