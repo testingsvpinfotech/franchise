@@ -43,6 +43,87 @@ class Franchise_manager extends CI_Controller
 
 	}
 
+
+	public function Profile($id)
+	{   $data =[];
+		// Fetch profile info from tbl_customers
+		$data['profile_info'] = $this->db->query("SELECT * FROM tbl_customers WHERE customer_id ='$id'")->row();
+		$data['franchise_info'] = $this->db->query("SELECT * FROM tbl_franchise")->row();
+        $this->load->view('franchise/change_pass/profile_edit',$data);
+	}
+
+	public function update_profile($id)
+{
+    if ($this->input->post()) {
+        $data = [
+            'customer_name' => $this->input->post('customer_name'),
+            'email' => $this->input->post('email'),
+            'branch_id' => $this->input->post('branch_id'),
+            'address' => $this->input->post('address'),
+            'city' => $this->input->post('city'),
+            'state' => $this->input->post('state'),
+            'phone' => $this->input->post('phone')
+        ];
+
+        $this->db->where('customer_id', $id);
+        $this->db->update('tbl_customers', $data);
+
+        if ($this->db->affected_rows() > 0) {
+            $this->session->set_flashdata('notify', 'Data updated successfully.');
+            $this->session->set_flashdata('class', 'alert alert-success alert-dismissible');
+        } else {
+            $this->session->set_flashdata('notify', 'Failed to update data.');
+            $this->session->set_flashdata('class', 'alert alert-danger alert-dismissible');
+        }
+        redirect('franchise/edit_profile/' . $id);
+    }
+}
+
+	public function change_pass()
+	{
+		if ($this->input->server('REQUEST_METHOD') == 'POST') {
+			$customerId = $this->input->post('customer_id');
+			$oldPassword = $this->input->post('oldPassword');
+			$newPassword = $this->input->post('newPassword');
+			$confirmedPassword = $this->input->post('confirmPassword');
+	
+			if ($newPassword != $confirmedPassword) {
+				$msg = 'New password and confirm password do not match.';
+				$class = 'alert alert-danger alert-dismissible';
+			} else {
+				// Hash passwords
+				$hashedNewPassword = md5($newPassword);
+				$hashedOldPassword = md5($oldPassword);
+	
+				// Check old password from the database
+				$this->db->select('customer_id');
+				$this->db->where('customer_id', $customerId);
+				$this->db->where('password', $hashedOldPassword);
+				$query = $this->db->get('tbl_customers'); 
+	
+				if ($query->num_rows() == 1) {
+					// Password correct, update it
+					$data = array('password' => $hashedNewPassword);
+					$this->db->where('customer_id', $customerId);
+					$this->db->update('tbl_customers', $data); 
+	
+					$msg = 'Password updated successfully.';
+					$class = 'alert alert-success alert-dismissible';
+				} else {
+					// Incorrect old password
+					$msg = 'Incorrect old password.';
+					$class = 'alert alert-danger alert-dismissible';
+				}
+			}
+			// Set flashdata and redirect
+			$this->session->set_flashdata('notify', $msg);
+			$this->session->set_flashdata('class', $class);
+			redirect('franchise/change_password');
+		}
+	
+		$this->load->view('franchise/change_pass/change_password');
+	}
+
 	public function franchise_printlabel($prntext)
 	{
 		// Load library
@@ -1350,8 +1431,11 @@ class Franchise_manager extends CI_Controller
 					if ($val == 'pod_no') {
 						$filterCond .= " AND tbl_domestic_booking.pod_no = '$filter_value'";
 					}
-					if ($val == 'sender_name') {
-						$filterCond .= " AND tbl_domestic_booking.sender_name = '$filter_value'";
+					if ($val == 'sender_name' || $val == 'waking_customer') {
+						$filterCond .= " AND tbl_domestic_booking.sender_name = '$filter_value' AND tbl_domestic_booking.bnf_customer_id ='0'";
+					}
+					if ( $val == 'company_customer') {
+						$filterCond .= " AND tbl_domestic_booking.sender_name = '$filter_value' AND tbl_domestic_booking.bnf_customer_id !='0'";
 					}
 					if ($val == 'receiver_name') {
 						$filterCond .= " AND tbl_domestic_booking.receiver_name = '$filter_value'";
@@ -1391,11 +1475,11 @@ class Franchise_manager extends CI_Controller
 		$resActt = $this->db->query("SELECT * FROM tbl_domestic_booking  WHERE booking_type = 1  $where $filterCond ");
 
 
-		$resAct = $this->db->query("SELECT tbl_domestic_booking.*,transfer_mode.mode_name as mode_dispatch  FROM `tbl_domestic_booking`LEFT JOIN transfer_mode ON tbl_domestic_booking.mode_dispatch =transfer_mode.transfer_mode_id  WHERE booking_type = 1 $filterCond AND customer_id = '$user_id' GROUP BY tbl_domestic_booking.booking_id order by tbl_domestic_booking.booking_id DESC limit " . $offset . ",100");
-		// 	echo $this->db->last_query();exit;
+		$resAct = $this->db->query("SELECT tbl_domestic_booking.*,transfer_mode.mode_name as mode_dispatch  FROM `tbl_domestic_booking` JOIN transfer_mode ON tbl_domestic_booking.mode_dispatch =transfer_mode.transfer_mode_id  WHERE booking_type = 1 $filterCond AND customer_id = '$user_id' GROUP BY tbl_domestic_booking.booking_id order by tbl_domestic_booking.booking_id DESC limit " . $offset . ",100");
+			// echo $this->db->last_query();exit;
 		// 	echo $this->db->last_query();exit;
 
-		$download_query = "SELECT tbl_domestic_booking.*,transfer_mode.mode_name as mode_dispatch  FROM `tbl_domestic_booking`LEFT JOIN transfer_mode ON tbl_domestic_booking.mode_dispatch = transfer_mode.transfer_mode_id  WHERE booking_type = 1 $filterCond AND customer_id = '$user_id' GROUP BY tbl_domestic_booking.booking_id order by tbl_domestic_booking.booking_id DESC limit " . $offset . ",100";
+		$download_query = "SELECT tbl_domestic_booking.*,transfer_mode.mode_name as mode_dispatch  FROM `tbl_domestic_booking` JOIN transfer_mode ON tbl_domestic_booking.mode_dispatch = transfer_mode.transfer_mode_id  WHERE booking_type = 1 $filterCond AND customer_id = '$user_id' GROUP BY tbl_domestic_booking.booking_id order by tbl_domestic_booking.booking_id DESC limit " . $offset . ",100";
 
 
 

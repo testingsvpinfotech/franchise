@@ -69,24 +69,23 @@
 
                         <a href="<?= base_url('franchise/rate-calculator'); ?>" target="_blank" class="btn btn-sm btn-info text-white mr-1"><i class="mdi mdi-cube-send"></i> Rate Calculator</a>
 
-                        <a href="<?=base_url('assets/Franchise-Demo-Video/demo.mp4'); ?>" target="_blank" class="btn btn-sm btn-success text-white mr-1"><i class="mdi mdi-cube-send"></i> Franchise Demo</a>
+                        <!-- <a href="<?=base_url('assets/Franchise-Demo-Video/demo.mp4'); ?>" target="_blank" class="btn btn-sm btn-success text-white mr-1"><i class="mdi mdi-cube-send"></i> Franchise Demo</a> -->
 
                         <a href="<?= base_url('franchise/view-internal-status'); ?>" target="_blank" class="btn btn-sm btn-danger text-white mr-1"><i class="mdi mdi-cube-send"></i> Tracking</a>
-                        <?php if($_SESSION['franchise_type']==1){ 
+                        <?php if($_SESSION['franchise_type']==1 ||$_SESSION['franchise_type']==3){ 
                              $value = $_SESSION['customer_id']; 
                             $credit_limit = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
                                ?>
                          <li class="nav-item">
-                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" data-html="true" data-original-title="" title="">Credit Limit ₹<?=$credit_limit->credit_limit;?></button> <br>
-                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" data-html="true" data-original-title="" title="">Utilize  Amount₹<?=$credit_limit->credit_limit_utilize;?></button>
+                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" data-html="true" data-original-title="" title="">Credit Balance ₹ <?= $credit_limit->credit_limit - $credit_limit->credit_limit_utilize;?></button>
                         </li>
                         <?php } ?>                       
                         </li>
-                        <?php if($_SESSION['franchise_type']==2){ ?>
+                    
                          <li class="nav-item"> <?php $value = $_SESSION['customer_id']; 
                          $balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
                          ?>
-                            <button class="btn btn-sm btn-light" data-toggle="tooltip" data-html="true" data-original-title="" title="">Balance ₹ <?= $balance->wallet; ?></button>
+                            <button class="btn btn-sm btn-light" data-toggle="tooltip" data-html="true" data-original-title="" title="">Wallet Balance ₹ <?= $balance->wallet; ?></button>
                             <?php  $customer_id = $_SESSION['customer_id'];        
                             $transection = $this->db->query("SELECT * FROM tbl_wallet_recharge_transection WHERE status ='0' AND customer_id = '$customer_id'")->row();    
                             if(!empty($transection))
@@ -94,7 +93,6 @@
                             <a href="<?= base_url('atom_payment/Recharge_wallet/refresh_transcation');?>" title ="Faild Transaction Refresh" style="margin-top:2px;"><img src="<?= base_url('assets/update_icon.png');?>" width="40px"></a>
                             <?php } ?>
                         </li> 
-                         <?php } ?>
                           
                        
                          <li class="nav-item ">
@@ -114,19 +112,10 @@
                                 </a>
 
                                 <div class="dropdown-menu border dropdown-menu-right p-0">
-                                    <a href="" class="dropdown-item px-2 align-self-center d-flex">
-                                        <span class="icon-pencil mr-2 h6 mb-0"></span> Edit Profile</a>
-                                    <a href="" class="dropdown-item px-2 align-self-center d-flex">
-                                        <span class="icon-user mr-2 h6 mb-0"></span> View Profile</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a href="" class="dropdown-item px-2 align-self-center d-flex">
-                                        <span class="icon-support mr-2 h6  mb-0"></span> Help Center</a>
-                                    <a href="" class="dropdown-item px-2 align-self-center d-flex">
-                                        <span class="icon-globe mr-2 h6 mb-0"></span> Forum</a>
-                                    <a href="" class="dropdown-item px-2 align-self-center d-flex">
-                                        <span class="icon-settings mr-2 h6 mb-0"></span> Account Settings</a>
-                                    <div class="dropdown-divider"></div>
-                                    
+                                     <a href="<?php echo base_url('franchise/edit_profile/') . $_SESSION['customer_id']; ?>" class="dropdown-item px-2 align-self-center d-flex">
+                                     <span class="icon-pencil mr-2 h6 mb-0"></span> Edit Profile</a>
+                                        <a href="<?php echo base_url('franchise/change_password');?>" class="dropdown-item px-2 align-self-center d-flex">
+                                        <span class="fa fa-key mr-2 h6 mb-0"></span> Change Password</a>                                   
                                     <a href="<?php echo base_url('logout');?>" class="dropdown-item px-2 text-danger align-self-center d-flex">
 
                                          <span class="icon-logout mr-2 h6  mb-0"></span> Sign Out</a>

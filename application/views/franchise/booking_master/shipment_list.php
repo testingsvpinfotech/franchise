@@ -1,4 +1,4 @@
- <?php include(dirname(__FILE__).'/../franchise_shared/franchise_header.php'); ?>
+<?php include(dirname(__FILE__).'/../franchise_shared/franchise_header.php'); ?>
 <?php include(dirname(__FILE__).'/../franchise_shared/franchise_sidebar.php'); ?>
  <!-- START: Card Data-->
  <main>
@@ -28,32 +28,36 @@
                                   <?php  }  ?>
                                 </select>
                              </div>
+                             <div class="col-md-1">
+                                <label>Mode</label>
+                                <select class="form-control" name="mode_name" id="mode_name">
+                                    <option value="ALL">ALL</option>
+                                    <?php foreach($mode_details as $mn): ?>
+                                        <?php $selected = (isset($mn['transfer_mode_id']) && isset($transfer_mode_id) && $transfer_mode_id == $mn['transfer_mode_id']) ? 'selected' : ''; ?>
+                                        <option value="<?= $mn['transfer_mode_id']; ?>" <?= $selected; ?>><?= $mn['mode_name']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                             <div class="col-md-1">
-                              <label>Mode</label>
-                              <select class="form-control" name="mode_name" id="mode_name">
-                                  <option value="ALL"> ALL</option>
-                                  <?php foreach( $mode_details as $mn){?>
-                                  <option value="<?= $mn['transfer_mode_id'];?>" <?= (isset($mn['transfer_mode_id']) && $transfer_mode_id == $mn['transfer_mode_id']) ? 'selected':'';?> ><?= $mn['mode_name'];?></option>
-                                  <?php }?>
-                              </select>
-                             </div>
-                            <div class="col-md-1">
-                              <label>ALL Filter</label>
-                             <select class="form-control" name="filter">
-                                 <option>Select Filter</option>
-                                 <option value="pod_no" <?php echo($_POST['filter']=='pod_no') ? 'selected':'';?> >Pod No</option>
-                                 <!--<option value="forwording_no" <?php echo($_POST['filter'] == 'forwording_no')?'selected':'';?> >Forwording No</option>-->
-                                 <option value="sender_name" <?php echo($_POST['filter']=='sender_name') ? 'selected':'';?>>Sender Name</option>
-                                 <option value="receiver_name" <?php echo($_POST['filter'] == 'receiver_name') ? 'selected':'';?>>Receiver Name</option>
-                                 <option value="origin" <?php echo($_POST['filter']== 'origin') ? 'selected':'';?>>ORIGIN</option>
-                                 <option value="destination" <?php echo($_POST['filter'] == 'destination') ? 'selected':'';?>>Destination</option>
-                                 <option value="pickup" <?php echo($_POST['filter'] == 'pickup')? 'selected':'' ;?>>Pickup</option>
-                             </select>
-                             </div>
+                                <label>ALL Filter</label>
+                                <select class="form-control" name="filter">
+                                    <option>Select Filter</option>
+                                    <option value="pod_no" <?= isset($_POST['filter']) && $_POST['filter'] == 'pod_no' ? 'selected' : ''; ?>>Pod No</option>
+                                    <!--<option value="forwording_no" <?php echo($_POST['filter'] == 'forwording_no')?'selected':'';?> >Forwording No</option>-->
+                                    <option value="sender_name" <?= isset($_POST['filter']) && $_POST['filter'] == 'sender_name' ? 'selected' : ''; ?>>Sender Name</option>
+                                    <option value="receiver_name" <?= isset($_POST['filter']) && $_POST['filter'] == 'receiver_name' ? 'selected' : ''; ?>>Receiver Name</option>
+                                    <option value="origin" <?= isset($_POST['filter']) && $_POST['filter'] == 'origin' ? 'selected' : ''; ?>>ORIGIN</option>
+                                    <option value="destination" <?= isset($_POST['filter']) && $_POST['filter'] == 'destination' ? 'selected' : ''; ?>>Destination</option>
+                                    <option value="pickup" <?= isset($_POST['filter']) && $_POST['filter'] == 'pickup' ? 'selected' : ''; ?>>Pickup</option>
+                                    <option value="waking_customer" <?= isset($_POST['filter']) && $_POST['filter'] == 'waking_customer' ? 'selected' : ''; ?>> Waking Customer</option>
+                                    <option value="company_customer" <?= isset($_POST['filter']) && $_POST['filter'] == 'company_customer' ? 'selected' : ''; ?>> Company Customer</option>
+                                </select>
+                            </div>
                             <div class="col-md-1">
                               <label>Filter Value</label>
-                             	<input type="text" class="form-control"  value="<?php echo $_POST['filter_value']; ?>" name="filter_value" />
+                             	<input type="text" class="form-control"  value="<?php echo !empty($_POST['filter_value'])?$_POST['filter_value']:''; ?>" name="filter_value" />
                              </div>
+                             
         <!--                    <div class="col-md-1">-->
         <!--                       <label>Customer</label>-->
         <!--                       <select class="form-control" name="user_name" id="user_name">-->
@@ -65,18 +69,17 @@
         <!--                     </div>-->
                             <div class="col-md-1">
                               <label>From Date</label>
-                              <input type="date" name="from_date"  value="<?php echo $_POST['from_date']; ?>" id="from_date" autocomplete="off" class="form-control">
+                              <input type="date" name="from_date"  value="<?php echo !empty($_POST['from_date']) ?$_POST['from_date']:''; ?>" id="from_date" autocomplete="off" class="form-control">
                              </div>
                             <div class="col-md-1">
                               <label>To Date</label>
-                               <input type="date" name="to_date"  value="<?php echo $_POST['to_date']; ?>" id="to_date" autocomplete="off" class="form-control">   
+                               <input type="date" name="to_date"  value="<?php echo !empty($_POST['to_date'])?$_POST['to_date']:''; ?>" id="to_date" autocomplete="off" class="form-control">   
                              </div>
                              <div class="col-md-3 mt-4">
                               <input type="submit" value="Search" class="btn btn-primary">
                               <input type="submit" class="btn btn-outline-success" name="download_report" value="Excel">
-                              <a href="<?php echo base_url('franchise/shipment-list');?>" class="btn btn-danger">Reset</a>
-                             </div>
-                           
+                              <a href="<?php echo base_url('franchise/shipment-list');?>" class="btn btn-danger pt-2 pb-2">Reset</a>
+                             </div>                           
                          </div>
                     </div>
                   </form>
@@ -87,9 +90,7 @@
                                     <?php unset($_SESSION['class']);
                                         unset($_SESSION['notify']);
                                     } ?>
-           
-             
-                    <div class="table-responsive">
+           <div class="table-responsive">
                         <table id="id1" class="display table  table-responsive table-striped table-bordered">
                             <thead>
                             <tr>
@@ -149,17 +150,29 @@
                                 <?php if($value->booking_type == 1){?>
                                 <td>  <button type="button" class="btn btn-outline-success btn-sm">Booked</button>
                                 <?php } 
-                                $city_id2 = $value->sender_city;
-														$resAct = $this->db->query("select * from tbl_city where city_id='$city_id2'");
-														$city_sender = $resAct->row()->city_name;
-
-														$city_id3 = $value->reciever_city;
-														$resActs = $this->db->query("select * from tbl_city where city_id='$city_id3'");
-														$city_reciver = $resActs->row()->city_name;
-														$print_string = $value->pod_no . '#|#' . $city_sender . '#|#' . $city_reciver . '#|#' . $value->mode_dispatch . '#|#' . $value->no_of_pack . '#|#' . $value->reciever_address;
-														$print_string = base64_encode($print_string);
-														$print_string = rtrim($print_string, '=');
-                                                        if($value->pickup_in_scan == '0' && $value->branch_in_scan == '0'){
+                                    $city_id2 = $value->sender_city;
+                                    $resAct = $this->db->query("select * from tbl_city where city_id='$city_id2'");
+                                    if ($resAct->row() !== null) {
+                                        $city_sender = $resAct->row()->city_name;
+                                    } else {
+                                        $city_sender = "Unknown"; 
+                                        error_log("No row fetched from the query in shipment_list.php");
+                                    }
+                                    $city_id3 = $value->reciever_city;
+                                    $resActs = $this->db->query("select * from tbl_city where city_id='$city_id3'"); 
+                                    if ($resActs->row() !== null) {  
+                                        $city_receiver = $resActs->row()->city_name;
+                                    } else {   
+                                        $city_receiver = "Unknown"; 
+                                        error_log("No row fetched from the query in shipment_list.php");
+                                    }
+                                    $city_reciver = "";  
+                                    $city_reciver = "Some City"; 
+                                    $no_of_pack = isset($value->no_of_pack) ? $value->no_of_pack : 'N/A';
+                                    $print_string = $value->pod_no . '#|#' . $city_sender . '#|#' . $city_reciver . '#|#' . $value->mode_dispatch . '#|#' . $no_of_pack . '#|#' . $value->reciever_address;
+                                    $print_string = base64_encode($print_string);
+                                    $print_string = rtrim($print_string, '=');
+                                    if($value->pickup_in_scan == '0' && $value->branch_in_scan == '0'){
                                 ?>
 
                                 <button type="button" relid = "<?= $value->booking_id ;?>"  class="btn btn-outline-danger view_shipment btn-sm mt-1">Cancel</button> <?php } ?></td>
@@ -177,18 +190,15 @@
                     <div class="row">
 					<div class="col-md-6">
 							<?php echo $this->pagination->create_links(); ?>
-						
 					</div>
 				  </div>
                 </div>
             </div>
-
         </div>
     </div>
     <!-- END: Card DATA-->
 </div>
 </main>
-
 <div class="modal fade" id="show_shipment_data">
 <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -209,8 +219,6 @@
                     <td> Booking Date  </td> <td><p id="booking_date"></p></td>
                 <!--</tr>-->
                 <!--<tr>-->
-                  
-                  
                 </tr>
                 <tr>
                    <td> Receiver Zone </td> <td><p id="receiver_zone"></p></td>
@@ -249,9 +257,8 @@
                 </tr>
                 <tr>
                     <td>Enter Cancel Reason</td>
-                  <td>  <textarea name = "cancel_msg" id="cancel_msg" rows="4" cols="50" placeholder="Enter Comment.." required></textarea></td>
-                </tr>
-                
+                    <td>  <textarea name = "cancel_msg" id="cancel_msg" rows="4" cols="50" placeholder="Enter Comment.." required></textarea></td>
+                </tr>                
             </table>
           </div>
             <div class="modal-footer">
@@ -271,18 +278,6 @@
     margin: 1.75rem auto;
 }}
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
 
 <?php include(dirname(__FILE__).'/../franchise_shared/franchise_footer.php'); ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.all.min.js"></script> 
@@ -411,7 +406,4 @@
         
         
     });
-</script>
-
-
-    
+</script>    

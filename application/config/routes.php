@@ -868,3 +868,7 @@ $route['Ms-franchise/awb-available-stock/(:num)'] 	= 'Master_franchise_manager/a
 $route['pay-franchise-amount'] = 'atom_payment/Recharge_wallet/index';
 $route['franchise-payment-transaction'] = 'atom_payment/Recharge_wallet/transaction_list';
 $route['m-franchise-payment-transaction'] = 'atom_payment/Recharge_wallet/transaction_master_list';
+// edit profile 
+$route['franchise/change_password']         = 'Franchise_manager/change_pass';
+$route['franchise/edit_profile/(:num)']            = 'Franchise_manager/Profile/$1';
+$route['franchise/update/profile/(:num)']          = 'Franchise_manager/update_profile/$1';
