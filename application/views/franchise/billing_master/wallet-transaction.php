@@ -12,11 +12,7 @@
                         <h6 class="">Billing - B2B Pricing</h6>
                     </div>
                 </div>
-
-                 <?php  include(dirname(__FILE__).'/../billing_master/billing_tab.php'); ?>
                 <hr>
-
-
                 <div class="row">
                     <div class="col-12 col-sm-12">
                         <div class="card mb-4">

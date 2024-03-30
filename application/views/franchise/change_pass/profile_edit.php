@@ -38,24 +38,37 @@
                         </div>
                         <div class="col-3 mb-3"> 
                             <label for="email">Email Address</label>
-                            <input type="email" class="form-control" name="email" id="exampleInputEmail1"  placeholder="Enter email" value="<?php echo $profile_info->email; ?>">
-                        </div>
-                        <div class="col-3 mb-3">
-                          <label for="username">Branch Code</label>
-                          <input type="text" class="form-control" name="branch_id" id="jq-validation-email" placeholder="Enter Branch Code" value="<?php echo $profile_info->branch_id;?>">
+                            <input type="email" class="form-control" name="email" id="exampleInputEmail1"  placeholder="Enter email" value="<?php echo $profile_info->email; ?>" readonly>
                         </div>
                         <div class="col-3 mb-3">
                           <label for="address">Address</label>
                           <input type="text" class="form-control" name="address" placeholder="Enter address" value="<?php echo $profile_info->address; ?>">
                         </div>
+
                         <div class="col-3 mb-3">
-                          <label for="city">City</label>
-                          <input type="text" class="form-control" name="city" placeholder="Enter City" value="<?php echo $profile_info->city; ?>">
+                            <label for="state">State</label>
+                            <select class="form-control" name="state" id="stateSelect">
+                                <option value="">Select State</option>
+                                <?php foreach ($state_data as $state) { ?>
+                                    <option value="<?php echo $state['id']; ?>" <?php echo ($state['id'] == $profile_info->state) ? 'selected' : ''; ?>>
+                                        <?php echo $state['state']; ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
                         </div>
+
                         <div class="col-3 mb-3">
-                          <label for="state">State</label>
-                          <input type="text" class="form-control" name="state" placeholder="Enter State" value="<?php echo $profile_info->state;?>">
+                            <label for="city">City</label>
+                            <select class="form-control" name="city" id="citySelect">
+                                <option value="">Select City</option>
+                                <?php foreach ($city_data as $city) { ?>
+                                    <option value="<?php echo $city['id']; ?>" <?php echo ($city['id'] == $profile_info->city) ? 'selected' : ''; ?>>
+                                        <?php echo $city['city']; ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
                         </div>
+
                        <div class="col-3 mb-3">
                             <label for="username">Contact No</label>
                            <input type="text" class="form-control" name="phone" id="exampleInputEmail1" placeholder="Enter Contact No" value="<?php echo $profile_info->phone; ?>">

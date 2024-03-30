@@ -49,6 +49,8 @@ class Franchise_manager extends CI_Controller
 		// Fetch profile info from tbl_customers
 		$data['profile_info'] = $this->db->query("SELECT * FROM tbl_customers WHERE customer_id ='$id'")->row();
 		$data['franchise_info'] = $this->db->query("SELECT * FROM tbl_franchise")->row();
+		$data['state_data']   = $this->db->query("SELECT * FROM `state` where id")->result_array();
+		$data['city_data']   = $this->db->query("SELECT * FROM city where id")->result_array();
         $this->load->view('franchise/change_pass/profile_edit',$data);
 	}
 
@@ -58,7 +60,6 @@ class Franchise_manager extends CI_Controller
         $data = [
             'customer_name' => $this->input->post('customer_name'),
             'email' => $this->input->post('email'),
-            'branch_id' => $this->input->post('branch_id'),
             'address' => $this->input->post('address'),
             'city' => $this->input->post('city'),
             'state' => $this->input->post('state'),
