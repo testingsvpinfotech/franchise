@@ -493,12 +493,14 @@ class Franchise_manager extends CI_Controller
 			$balance = $this->db->query("Select * from tbl_customers where customer_id = '$user_id'")->row();
 			$amount = $balance->wallet;
 			$update_val = $amount - $this->input->post('grand_total');			
+			if($this->input->post('dispatch_details')!='TOPAY'){
 			if ($update_val < 0) {
 				$msg = 'You Dont Have sufficient Balance!';
 				$class = 'alert alert-danger alert-dismissible';
 				$this->session->set_flashdata('notify', $msg);
 				$this->session->set_flashdata('class', $class);
 				redirect('franchise/shipment-list');
+			}
 			}
 			if($this->input->post('doc_type')=='1'){
 			if (empty($this->input->post('invoice_value'))) {
@@ -710,31 +712,46 @@ class Franchise_manager extends CI_Controller
 				} elseif (strlen($id) == 5) {
 					$franchise_id = 'BFT1000' . $id;
 				}
-				if ($this->input->post('grand_total') != '') {
-					//$value = $_SESSION['customer_id'];
+ 
+				if($this->input->post('dispatch_details')!='TOPAY'){
+					if ($this->input->post('grand_total') != '') {
+						//$value = $_SESSION['customer_id'];
+						$value = $this->session->userdata('customer_id');
+						$g_total = $this->input->post('grand_total');
+						$balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
+						$amount = $balance->wallet;
+						$update_val = $amount - $this->input->post('grand_total');
+						$whr5 = array('customer_id' => $_SESSION['customer_id']);
+						$data1 = array('wallet' => $update_val);
+						$result = $this->basic_operation_m->update('tbl_customers', $data1, $whr5);
+						$franchise_id1 = $balance->cid;
+							$data9 = array(
+							'franchise_id' => $franchise_id1,
+							'customer_id' => $user_id,
+							'transaction_id' => $franchise_id,
+							'payment_date' => $date,
+							'debit_amount' => $g_total,
+							'balance_amount' => $update_val,
+							'payment_mode' => $payment_mode,
+							'bank_name' => $bank_name,
+							'status' => 1,
+							'refrence_no' => $pod_no
+						);
+						$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
+					}
+			   }else{
 					$value = $this->session->userdata('customer_id');
 					$g_total = $this->input->post('grand_total');
-					$balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
-					$amount = $balance->wallet;
-					$update_val = $amount - $this->input->post('grand_total');
-					$whr5 = array('customer_id' => $_SESSION['customer_id']);
-					$data1 = array('wallet' => $update_val);
-					$result = $this->basic_operation_m->update('tbl_customers', $data1, $whr5);
-					$franchise_id1 = $balance->cid;
-						$data9 = array(
-						'franchise_id' => $franchise_id1,
-						'customer_id' => $user_id,
-						'transaction_id' => $franchise_id,
-						'payment_date' => $date,
-						'debit_amount' => $g_total,
-						'balance_amount' => $update_val,
-						'payment_mode' => $payment_mode,
-						'bank_name' => $bank_name,
-						'status' => 1,
-						'refrence_no' => $pod_no
-					);
-					$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
-				}
+					$balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row('wallet');
+					$ShipmentDeducted = $balance - $g_total;
+					if($ShipmentDeducted < -1001){
+						$msg = "You Dont Have sufficient Balance!";
+						$class = 'alert alert-danger alert-dismissible';  
+						$this->session->set_flashdata('notify', $msg);
+						$this->session->set_flashdata('class', $class);
+						redirect('franchise/shipment-list');
+					}
+			   }
 			}
 			$this->db->trans_complete();
 			if ($this->db->trans_status() === TRUE)
@@ -783,12 +800,14 @@ class Franchise_manager extends CI_Controller
 			$credit_limit = $balance->credit_limit;
 			$amount = $balance->credit_limit_utilize;
 			$update_val = $amount + $this->input->post('grand_total1');
+			if($this->input->post('dispatch_details')!='TOPAY'){
 			if ($credit_limit < $update_val) {
 				$msg = 'You Dont Have sufficient Credit Limit Balance!';
 				$class = 'alert alert-danger alert-dismissible';
 				$this->session->set_flashdata('notify', $msg);
 				$this->session->set_flashdata('class', $class);
 				redirect('franchise/shipment-list');
+			}
 			}
 			if($this->input->post('doc_type')=='1'){
 			if (empty($this->input->post('invoice_value'))) {
@@ -942,7 +961,10 @@ class Franchise_manager extends CI_Controller
 				}
 				if(!empty($this->input->post('door_delivery_charges'))){
 					$commision['door_delivery_access']= 1;
-				}				
+				}	
+				if($this->input->post('dispatch_details')=='TOPAY'){
+					$commision['booking_type']= 1;
+				}			
 				$this->basic_operation_m->insert('tbl_franchise_comission', $commision);
 				
 				$weight_data = array(
@@ -1031,35 +1053,49 @@ class Franchise_manager extends CI_Controller
 				} elseif (strlen($id) == 5) {
 					$franchise_id = 'BFT1000' . $id;
 				}
-				if ($this->input->post('grand_total1') != '') {
-					//$value = $_SESSION['customer_id'];
+				if($this->input->post('dispatch_details')!='TOPAY'){
+					if ($this->input->post('grand_total1') != '') {
+						//$value = $_SESSION['customer_id'];
+						$value = $this->session->userdata('customer_id');
+						$g_total = $this->input->post('grand_total1');
+						$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
+						$cust = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
+						$amount = $balance->credit_limit_utilize;
+						$update_val = $amount + $this->input->post('grand_total1');
+						$whr5 = array('fid' => $_SESSION['customer_id']);
+						$data1 = array('credit_limit_utilize' => $update_val);
+						$result = $this->basic_operation_m->update('tbl_franchise', $data1, $whr5);
+					
+						$franchise_id1 = $cust->cid;
+							$data9 = array(
+							'franchise_id' => $franchise_id1,
+							'customer_id' => $user_id,
+							'transaction_id' => $franchise_id,
+							'payment_date' => $date,
+							'debit_amount' => $g_total,
+							'balance_amount' => $update_val,
+							'payment_mode' => $payment_mode,
+							'bank_name' => $bank_name,
+							'status' => 1,
+							'franchise_type' =>$_SESSION['franchise_type'] ,
+							'refrence_no' => $pod_no
+						);
+						$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
+						// echo $this->db->last_query();die;
+					}
+			    }else{
 					$value = $this->session->userdata('customer_id');
 					$g_total = $this->input->post('grand_total1');
-					$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
-					$cust = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
-					$amount = $balance->credit_limit_utilize;
-					$update_val = $amount + $this->input->post('grand_total1');
-					$whr5 = array('fid' => $_SESSION['customer_id']);
-					$data1 = array('credit_limit_utilize' => $update_val);
-					$result = $this->basic_operation_m->update('tbl_franchise', $data1, $whr5);
-				
-					$franchise_id1 = $cust->cid;
-						$data9 = array(
-						'franchise_id' => $franchise_id1,
-						'customer_id' => $user_id,
-						'transaction_id' => $franchise_id,
-						'payment_date' => $date,
-						'debit_amount' => $g_total,
-						'balance_amount' => $update_val,
-						'payment_mode' => $payment_mode,
-						'bank_name' => $bank_name,
-						'status' => 1,
-						'franchise_type' =>$_SESSION['franchise_type'] ,
-						'refrence_no' => $pod_no
-					);
-					$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
-					// echo $this->db->last_query();die;
-				}
+					$balance = $this->db->query("Select * from tbl_franchise where cid = '$value'")->row('credit_limit_utilize');
+					$ShipmentDeducted = $balance + $g_total;
+					if($ShipmentDeducted < -1001){
+						$msg = "You Dont Have sufficient Balance!";
+						$class = 'alert alert-danger alert-dismissible';  
+						$this->session->set_flashdata('notify', $msg);
+						$this->session->set_flashdata('class', $class);
+						redirect('franchise/shipment-list');
+					}
+			   }
 			}
 			$this->db->trans_complete();
 			if ($this->db->trans_status() === TRUE)

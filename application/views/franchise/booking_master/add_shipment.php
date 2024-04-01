@@ -110,9 +110,10 @@
                                               
                                             <?php
                                                if($_SESSION['franchise_type']!=3){   ?>
-                                             <option value="<?= $_SESSION['franchise_type'];?>"><?= bill_type[$_SESSION['franchise_type']];?></option>
+                                                <option value="<?= bill_type[$_SESSION['franchise_type']];?>"><?= bill_type[$_SESSION['franchise_type']];?></option>
+                                                <option value="TOPAY">TOPAY</option>
                                           <?php }else{  foreach(bill_type as $key =>$value){?>
-                                                 <option value="<?= $key;?>" ><?= $value;?></option>
+                                                 <option value="<?= $value;?>" ><?= $value;?></option>
                                                 <?php }}?>
                                             </select>
                                         </div>
