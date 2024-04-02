@@ -37,6 +37,25 @@ class Booking_model extends CI_Model {
 		$query=$this->db->get();	
 		return $query->result_array();
 	}
+	public function get_invoice_max_id($table, $field, $branch_code, $type){
+		$yr = date('y').(date('y')+1).date('m');
+		if($type == 'Cash' || $type == 'CASH'){ $m = 'C'; }elseif($type == 'ToPay' || $type == 'TOPAY'){ $m = 'T'; } else{ $m = 'R'; }
+		$append_code = $branch_code.$yr.$m;
+		$length = strlen($append_code)+1;
+    	$code = $this->db->query("SELECT MAX(CAST(SUBSTR(TRIM(invoice_no),$length) AS UNSIGNED)) AS invoice_no FROM tbl_domestic_invoice WHERE invoice_no RLIKE '$append_code'")->result_array();
+    	
+    	if(empty($code[0]['invoice_no']))
+    	{
+      		$retstr = $append_code.'1001';
+      		return $retstr;
+    	}
+    	else
+    	{
+      		$str = $code[0]['invoice_no'] + 1;
+      		$retstr = $append_code.$str;
+      		return $retstr;
+    	}
+	}
 	public function select_invoice_setting_details()
 	{
 		$this->db->select('*');

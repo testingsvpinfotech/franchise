@@ -593,7 +593,7 @@ class Admin_franchise_bag extends CI_Controller {
 		}
 	
 		$resAct5 = $this->db->query("SELECT * FROM tbl_domestic_booking where pod_no ='$forwording_no' and is_delhivery_complete = '0'  and pickup_in_scan ='1' and pickup_in_scan ='1'  $where limit 1");	
-// 		echo $this->db->last_query();die;
+		// echo $this->db->last_query();die;
 		
 		if ($resAct5->num_rows() == 0)
 		{

@@ -929,8 +929,6 @@ class Franchise_manager extends CI_Controller
 			$result = $this->db->insert('tbl_domestic_booking', $data);
           
 			$all_Data = $this->input->post();
-
-
 			$lastid = $this->db->insert_id();
 			if (empty($lastid)) {
 
@@ -1033,7 +1031,7 @@ class Franchise_manager extends CI_Controller
 				}
 			}
 			if (!empty($result)) {
-				$query = "SELECT MAX(topup_balance_id) as id FROM franchise_topup_balance_tbl ";
+			    $query = "SELECT MAX(topup_balance_id) as id FROM franchise_topup_balance_tbl ";
 				$result1 = $this->basic_operation_m->get_query_row($query);
 				$id = $result1->id + 1;
 				//print_r($id); exit;
