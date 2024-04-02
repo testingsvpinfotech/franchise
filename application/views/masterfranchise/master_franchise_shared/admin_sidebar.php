@@ -27,9 +27,16 @@
                                         $balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
                                         // echo $this->db->last_query();
                                         ?><button class="btn btn-sm btn-light" data-toggle="tooltip" data-html="true"
-                                            data-original-title="" title="">Balance ₹
+                                            data-original-title="" title="" disabled>Wallet Balance ₹
                                             <?= $balance->wallet; ?>
                                         </button>
+                                        <?php if($_SESSION['franchise_type']==1 ||$_SESSION['franchise_type']==3){ 
+                                            $value = $_SESSION['customer_id']; 
+                                            $credit_limit = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
+                                            ?>
+                                            <br>
+                                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" disabled data-html="true" data-original-title="" title="">Credit Balance ₹ <?= $credit_limit->credit_limit - $credit_limit->credit_limit_utilize;?></button>
+                                        <?php } ?>      
                                         <?php  $customer_id = $_SESSION['customer_id'];        
                             $transection = $this->db->query("SELECT * FROM tbl_wallet_recharge_transection WHERE status ='0' AND customer_id = '$customer_id'")->row();    
                             if(!empty($transection))
@@ -45,11 +52,6 @@
                                     <li class="nav-item">
                                         <a href="<?= base_url('master-franchise/rate-calculator'); ?>"
                                             class="btn btn-sm btn-info mt-1" style="color:#fff;"> Rate Calculator</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="<?= base_url('assets/Franchise-Demo-Video/demo.mp4'); ?>"
-                                            target="_blank" class="btn btn-sm btn-success text-white mr-1"> Franchise
-                                            Demo</a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="<?= base_url('master-franchise/view-internal-status'); ?>"

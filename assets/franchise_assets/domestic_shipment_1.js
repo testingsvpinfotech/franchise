@@ -72,7 +72,7 @@ $("#desabledBTN").click(function() {
 			}else{
 				getRate(0);
 			}
-			fuelCalculate();
+			// fuelCalculate();
 			$('#desabledBTN').prop('disabled', true);
 		}	
 });

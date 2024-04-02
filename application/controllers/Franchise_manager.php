@@ -1,5 +1,5 @@
 <?php
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Franchise_manager extends CI_Controller
@@ -357,7 +357,7 @@ class Franchise_manager extends CI_Controller
 		$courier_id = $this->input->post('courier_id');
 		$sub_amount = $this->input->post('sub_amount');
 		$booking_date = $this->input->post('booking_date');
-
+        // print_r($_POST['customer_id']);die;
 		$get_fuel_id = $this->db->query("select * from franchise_delivery_tbl where delivery_franchise_id = '$customer_id'")->row();
 		$dd = $get_fuel_id->fule_group;
 		$get_fuel_details = $this->db->query("select * from franchise_fule_tbl where group_id = '$dd'")->row();
@@ -1084,7 +1084,7 @@ class Franchise_manager extends CI_Controller
 			    }else{
 					$value = $this->session->userdata('customer_id');
 					$g_total = $this->input->post('grand_total1');
-					$balance = $this->db->query("Select * from tbl_franchise where cid = '$value'")->row('credit_limit_utilize');
+					$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row('credit_limit_utilize');
 					$ShipmentDeducted = $balance + $g_total;
 					if($ShipmentDeducted < -1001){
 						$msg = "You Dont Have sufficient Balance!";

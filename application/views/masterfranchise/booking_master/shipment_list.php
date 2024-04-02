@@ -1,4 +1,7 @@
-<?php $this->load->view('masterfranchise/master_franchise_shared/admin_header.php'); ?>
+<?php $this->load->view('masterfranchise/master_franchise_shared/admin_header.php'); 
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+?>
     <!-- END Head-->
 <style>
   	.input:focus {
@@ -24,6 +27,7 @@
                        <a href="<?php echo base_url();?>master-franchise/cancel-shipment-list"> <button type="button" class="btn btn-danger text-white mr-1">Cancel Shipment</button></a>
                     </div>
                 </div>
+
                 <div class="row p-2">
                     <div class="col-md-12">
                       <form role="form" action="<?php echo base_url();?>master-franchise/shipment-list" method="post" enctype="multipart/form-data">
@@ -37,55 +41,48 @@
                                   <?php  }  ?>
                                 </select>
                              </div>
+                             <div class="col-md-1">
+                                <label>Mode</label>
+                                <select class="form-control" name="mode_name" id="mode_name">
+                                    <option value="ALL">ALL</option>
+                                    <?php foreach($mode_details as $mn): ?>
+                                        <?php $selected = (isset($mn['transfer_mode_id']) && isset($transfer_mode_id) && $transfer_mode_id == $mn['transfer_mode_id']) ? 'selected' : ''; ?>
+                                        <option value="<?= $mn['transfer_mode_id']; ?>" <?= $selected; ?>><?= $mn['mode_name']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                             <div class="col-md-1">
-                              <label>Mode</label>
-                              <select class="form-control" name="mode_name" id="mode_name">
-                                  <option value="ALL"> ALL</option>
-                                  <?php foreach( $mode_details as $mn){?>
-                                  <option value="<?= $mn['transfer_mode_id'];?>" <?= (isset($mn['transfer_mode_id']) && $transfer_mode_id == $mn['transfer_mode_id']) ? 'selected':'';?> ><?= $mn['mode_name'];?></option>
-                                  <?php }?>
-                              </select>
-                             </div>
-                            <div class="col-md-1">
-                              <label>ALL Filter</label>
-                             <select class="form-control" name="filter">
-                                 <option>Select Filter</option>
-                                 <option value="pod_no" <?php echo($_POST['filter']=='pod_no') ? 'selected':'';?> >Pod No</option>
-                                 <!--<option value="forwording_no" <?php echo($_POST['filter'] == 'forwording_no')?'selected':'';?> >Forwording No</option>-->
-                                 <option value="sender_name" <?php echo($_POST['filter']=='sender_name') ? 'selected':'';?>>Sender Name</option>
-                                 <option value="receiver_name" <?php echo($_POST['filter'] == 'receiver_name') ? 'selected':'';?>>Receiver Name</option>
-                                 <option value="origin" <?php echo($_POST['filter']== 'origin') ? 'selected':'';?>>ORIGIN</option>
-                                 <option value="destination" <?php echo($_POST['filter'] == 'destination') ? 'selected':'';?>>Destination</option>
-                                 <option value="pickup" <?php echo($_POST['filter'] == 'pickup')? 'selected':'' ;?>>Pickup</option>
-                             </select>
-                             </div>
+                                <label>ALL Filter</label>
+                                <select class="form-control" name="filter">
+                                    <option>Select Filter</option>
+                                    <option value="pod_no" <?= isset($_POST['filter']) && $_POST['filter'] == 'pod_no' ? 'selected' : ''; ?>>Pod No</option>
+                                    <!--<option value="forwording_no" <?php echo($_POST['filter'] == 'forwording_no')?'selected':'';?> >Forwording No</option>-->
+                                    <option value="sender_name" <?= isset($_POST['filter']) && $_POST['filter'] == 'sender_name' ? 'selected' : ''; ?>>Sender Name</option>
+                                    <option value="receiver_name" <?= isset($_POST['filter']) && $_POST['filter'] == 'receiver_name' ? 'selected' : ''; ?>>Receiver Name</option>
+                                    <option value="origin" <?= isset($_POST['filter']) && $_POST['filter'] == 'origin' ? 'selected' : ''; ?>>ORIGIN</option>
+                                    <option value="destination" <?= isset($_POST['filter']) && $_POST['filter'] == 'destination' ? 'selected' : ''; ?>>Destination</option>
+                                    <option value="pickup" <?= isset($_POST['filter']) && $_POST['filter'] == 'pickup' ? 'selected' : ''; ?>>Pickup</option>
+                                    <option value="waking_customer" <?= isset($_POST['filter']) && $_POST['filter'] == 'waking_customer' ? 'selected' : ''; ?>> Waking Customer</option>
+                                    <option value="company_customer" <?= isset($_POST['filter']) && $_POST['filter'] == 'company_customer' ? 'selected' : ''; ?>> Company Customer</option>
+                                </select>
+                            </div>
                             <div class="col-md-1">
                               <label>Filter Value</label>
-                             	<input type="text" class="form-control"  value="<?php echo $_POST['filter_value']; ?>" name="filter_value" />
+                             	<input type="text" class="form-control"  value="<?php echo !empty($_POST['filter_value'])?$_POST['filter_value']:''; ?>" name="filter_value" />
                              </div>
-        <!--                    <div class="col-md-1">-->
-        <!--                       <label>Customer</label>-->
-        <!--                       <select class="form-control" name="user_name" id="user_name">-->
-								<!--<option value="" >Selecte Customer</option>-->
-							  <?php // if(!empty($customer)){foreach($customer as $key => $values)-->
-							//	{  ?>
-								<option value="<?php //echo $values['customer_id']; ?>"  <?php //echo (isset($user_id) && $user_id == $values['customer_id'])?'selected':''; ?>><?php //echo $values['customer_name']; ?></option><?php // } } ?>
-								<!--</select>-->
-        <!--                     </div>-->
                             <div class="col-md-1">
                               <label>From Date</label>
-                              <input type="date" name="from_date"  value="<?php echo $_POST['from_date']; ?>" id="from_date" autocomplete="off" class="form-control">
+                              <input type="date" name="from_date"  value="<?php echo !empty($_POST['from_date']) ?$_POST['from_date']:''; ?>" id="from_date" autocomplete="off" class="form-control">
                              </div>
                             <div class="col-md-1">
                               <label>To Date</label>
-                               <input type="date" name="to_date"  value="<?php echo $_POST['to_date']; ?>" id="to_date" autocomplete="off" class="form-control">   
+                               <input type="date" name="to_date"  value="<?php echo !empty($_POST['to_date'])?$_POST['to_date']:''; ?>" id="to_date" autocomplete="off" class="form-control">   
                              </div>
                              <div class="col-md-3 mt-4">
                               <input type="submit" value="Search" class="btn btn-primary">
                               <input type="submit" class="btn btn-outline-success" name="download_report" value="Excel">
-                              <a href="<?php echo base_url('master-franchise/shipment-list');?>" class="btn btn-danger">Reset</a>
-                             </div>
-                           
+                              <a href="<?php echo base_url('master-franchise/shipment-list');?>" class="btn btn-danger pt-2 pb-2">Reset</a>
+                             </div>                           
                          </div>
                     </div>
                   </form>
@@ -159,16 +156,16 @@
                                 <td>  <button type="button" class="btn btn-outline-success btn-sm">Booked</button>
                                 <?php } 
                                 $city_id2 = $value->sender_city;
-														$resAct = $this->db->query("select * from tbl_city where city_id='$city_id2'");
-														$city_sender = $resAct->row()->city_name;
+														$resAct = $this->db->query("select * from city where id='$city_id2'");
+														$city_sender = $resAct->row()->city;
 
 														$city_id3 = $value->reciever_city;
-														$resActs = $this->db->query("select * from tbl_city where city_id='$city_id3'");
-														$city_reciver = $resActs->row()->city_name;
+														$resActs = $this->db->query("select * from city where id='$city_id3'");
+														$city_reciver = $resActs->row()->city;
 														$print_string = $value->pod_no . '#|#' . $city_sender . '#|#' . $city_reciver . '#|#' . $value->mode_dispatch . '#|#' . $value->no_of_pack . '#|#' . $value->reciever_address;
 														$print_string = base64_encode($print_string);
 														$print_string = rtrim($print_string, '=');
-                                                        if($value->pickup_in_scan == '0' && $value->branch_in_scan == '0'){
+                               if($value->pickup_in_scan == '0' && $value->branch_in_scan == '0'){
                                 ?>
 
                                 <button type="button" relid = "<?= $value->booking_id ;?>"  class="btn btn-outline-danger view_shipment btn-sm mt-1">Cancel</button> <?php } ?></td>

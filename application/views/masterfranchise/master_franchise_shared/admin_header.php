@@ -17,6 +17,7 @@
         <!-- END Template CSS-->
 
         <!-- START: Page CSS-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css" integrity="sha512-IXuoq1aFd2wXs4NqGskwX2Vb+I8UJ+tGJEu/Dc0zwLNKeQ7CW3Sr6v0yU3z5OQWe3eScVIkER4J9L7byrgR/fA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel="stylesheet"  href="assets/admin_assets/dist/vendors/chartjs/Chart.min.css">
         <!-- END: Page CSS-->
 
@@ -31,6 +32,7 @@
         <!-- END: Page CSS-->
 
         <!-- START: Custom CSS-->
+        
         <link rel="stylesheet" href="assets/admin_assets/dist/css/main.css">
          <!-- <link rel="stylesheet" href="assets/plugins/bootstrap-select/bootstrap-select.min.css"> -->
          <link rel="stylesheet" href="assets/multiselect/bootstrap-multiselect.css" type="text/css">
@@ -38,8 +40,19 @@
 
 
          <link rel="stylesheet" href="assets/dist/vendors/datatable/css/dataTables.bootstrap4.min.css" />
+         
         <link rel="stylesheet" href="assets/dist/vendors/datatable/buttons/css/buttons.bootstrap4.min.css"/>
+      
 
          <link  href="<?php echo base_url(); ?>assets/dist/css/select2.min.css" rel="stylesheet" />
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js" integrity="sha512-JnjG+Wt53GspUQXQhc+c4j8SBERsgJAoHeehagKHlxQN+MtCCmFDghX9/AcbkkNRZptyZU4zC8utK59M5L45Iw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </head>
+    <style>
+        .sidebar .sidebar-menu {
+    padding: 0px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    list-style: none;
+}
+    </style>
     <!-- END Head-->
