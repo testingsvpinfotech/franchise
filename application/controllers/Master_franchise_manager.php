@@ -1026,7 +1026,7 @@ class Master_franchise_manager extends CI_Controller
 
 	public function pickup_in_scan_status_insert()
 	{
-
+        $data = [];
 		if ($_POST) {
 			$awb =  $this->input->post('pod_no');
 
