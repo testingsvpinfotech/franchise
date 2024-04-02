@@ -27,19 +27,24 @@
                     <input type="hidden" name="<?php echo $_SESSION['customer_id'];?>" value="<?php echo $_SESSION['customer_id'];?>" id="customer_id">
                     
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">From Pincode<span class="compulsory_fields">*</span></label>
-                        <div class="col-sm-4">
-                            <input type="text" id="sender_pincode_rate"  value="<?= $balance->pincode; ?>" class="form-control">
-                            <select  id="sender_state_rate" class="form-control" readonly style="display:none;">
-                                <option value="">--Select--</option>
-                            </select> <br>
-                            <select  id="sender_city_rate" readonly class="form-control">
-                                <option value="">--Select--</option>
-                            </select>
-                            <input type="hidden" name="receiver_zone_id" id="receiver_zone_id" class="form-control">
-                            <!-- <input type="hidden"  id="sender_state_rate" value="" class="form-control"> <br>
-                            <input type="text"  id="sender_city_rate" readonly value="" class="form-control"> -->
-                        </div>
+                            <label class="col-sm-2 col-form-label">From Pincode<span class="compulsory_fields">*</span></label>
+                            <div class="col-sm-4">
+                                <?php if(isset($balance) && !is_null($balance)): ?>
+                                    <input type="text" id="sender_pincode_rate" value="<?= $balance->pincode; ?>" class="form-control">
+                                <?php else: ?>
+                                    <input type="text" id="sender_pincode_rate" value="" class="form-control">
+                                <?php endif; ?>
+                                <select id="sender_state_rate" class="form-control" readonly style="display:none;">
+                                    <option value="">--Select--</option>
+                                </select> <br>
+                                <select id="sender_city_rate" readonly class="form-control">
+                                    <option value="">--Select--</option>
+                                </select>
+                                <input type="hidden" name="receiver_zone_id" id="receiver_zone_id" class="form-control">
+                                <!-- <input type="hidden"  id="sender_state_rate" value="" class="form-control"> <br>
+                                <input type="text"  id="sender_city_rate" readonly value="" class="form-control"> -->
+                            </div>
+                            
                         <label class="col-sm-2 col-form-label">To Pincode<span class="compulsory_fields">*</span></label>
                         <div class="col-sm-4">
                             <input type="number" class="form-control"  id="reciever_pincode_rate" autocomplete="off">
@@ -172,7 +177,7 @@ $(document).ready(function(){
 		
             $.ajax({
 				type: 'POST',
-				url: '../Franchise_manager/getState_rate',
+				url: '<?php echo base_url();?>Franchise_manager/getState_rate',
 				data: 'pincode=' + pincode,
 				dataType: "json",
 				success: function (data) 
@@ -183,7 +188,7 @@ $(document).ready(function(){
 			});
 			$.ajax({
 				type: 'POST',
-				url: '../Franchise_manager/getCityList_rate',
+				url: '<?php echo base_url();?>Franchise_manager/getCityList_rate',
 				data: 'pincode=' + pincode,
 				dataType: "json",
 				success: function (data) {					
@@ -202,7 +207,7 @@ $(document).ready(function(){
 		
             $.ajax({
 				type: 'POST',
-				url: '../Franchise_manager/getState_rate',
+				url: '<?php echo base_url();?>Franchise_manager/getState_rate',
 				data: 'pincode=' + pincode,
 				dataType: "json",
 				success: function (data) 
@@ -212,7 +217,7 @@ $(document).ready(function(){
 			});
 			$.ajax({
 				type: 'POST',
-				url: '../Franchise_manager/getCityList_rate',
+				url: '<?php echo base_url();?>Franchise_manager/getCityList_rate',
 				data: 'pincode=' + pincode,
 				dataType: "json",
 				success: function (data) {				
