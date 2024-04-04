@@ -1,11 +1,11 @@
-<?php echo $this->load->view('masterfranchise/master_franchise_shared/admin_header.php');?>
+<?php  $this->load->view('masterfranchise/master_franchise_shared/admin_header.php');?>
     <!-- END Head-->
 
     <!-- START: Body-->
     <body id="main-container" class="default">
        
         <!-- END: Main Menu-->
-		<?php echo $this->load->view('masterfranchise/master_franchise_shared/admin_sidebar.php');?>
+		<?php  $this->load->view('masterfranchise/master_franchise_shared/admin_sidebar.php');?>
 		
         <!-- END: Main Menu-->
     
@@ -165,7 +165,7 @@ echo date("Y-m-d H:i"); ?>">
     </main>
     <!-- END: Content-->
     <!-- START: Footer-->
-	<?php echo $this->load->view('masterfranchise/master_franchise_shared/admin_footer.php');?>
+	<?php  $this->load->view('masterfranchise/master_franchise_shared/admin_footer.php');?>
      
     <!-- START: Footer-->
 </body>

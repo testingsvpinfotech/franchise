@@ -107,6 +107,8 @@
                                     <li class="active"><a
                                             href="<?= base_url('master_franchise/franchise-list'); ?>">Unit
                                             Franchise List</a></li>
+                                    <li class="active"><a
+                                            href="<?= base_url('master_franchise/View_commision'); ?>">View Commission</a></li>
                                     <li class="active"><a href="<?= base_url('m-franchise-payment-transaction'); ?>">
                                             Payment Gateway Transection
                                         </a></li>

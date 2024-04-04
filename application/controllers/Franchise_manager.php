@@ -80,6 +80,12 @@ class Franchise_manager extends CI_Controller
     }
 }
 
+
+	public function list_commision(){
+		$data['shipment_info'] = $this->db->query("SELECT * FROM tbl_franchise_comission WHERE franchise_id = '".$_SESSION['customer_id']."'")->result_array();
+		$this->load->view('franchise/booking_master/view_commision',$data);
+	}
+
 	public function change_pass()
 	{
 		if ($this->input->server('REQUEST_METHOD') == 'POST') {

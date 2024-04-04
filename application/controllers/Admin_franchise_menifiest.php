@@ -452,7 +452,7 @@ class Admin_franchise_menifiest extends CI_Controller {
 		$resAct5 = $this->db->query("SELECT *,sum(tbl_domestic_bag.total_weight) as total_weight,sum(tbl_domestic_bag.total_pcs) as total_pcs FROM tbl_domestic_bag 
 		LEFT JOIN tbl_domestic_menifiest ON tbl_domestic_menifiest.bag_no = tbl_domestic_bag.bag_id 
 		where tbl_domestic_bag.bag_id='$bag_id' and tbl_domestic_bag.bag_recived='0' and tbl_domestic_bag.franchise_id = '$customer_id' AND tbl_domestic_menifiest.bag_no IS NULL limit 1");	
-	    //echo $this->db->last_query();die;
+	    // echo $this->db->last_query();die;
 		$data = "";
 		$bag_row = $resAct5->row_array();
        if (!empty($bag_row['bag_id'])) 

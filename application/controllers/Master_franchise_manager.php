@@ -1024,6 +1024,13 @@ class Master_franchise_manager extends CI_Controller
 		echo json_encode($output);
 	}
 
+	public function list_commision(){
+		$data['shipment_info'] = $this->db->query("SELECT * FROM tbl_franchise_comission WHERE franchise_id = '".$_SESSION['customer_id']."'")->result_array();
+		$this->load->view('masterfranchise/booking_master/view_commision',$data);
+	}
+
+
+	
 	public function pickup_in_scan_status_insert()
 	{
         $data = [];

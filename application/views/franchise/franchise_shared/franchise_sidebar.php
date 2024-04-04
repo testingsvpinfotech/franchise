@@ -97,6 +97,7 @@
 						</ul>
 					</li>
 					<li><a href="<?= base_url('franchise-payment-transaction')?>">Wallet Transactions</a></li>
+					<li><a href="<?= base_url('franchise/view-Commision')?>">View Commission</a></li>
 					<li class="dropdown"><a href="#">Reports</a>
 						<ul class="sub-menu">
 							<li><a href="<?= base_url('franchise/list-mis-report'); ?>">MIS Repors</a></li>							

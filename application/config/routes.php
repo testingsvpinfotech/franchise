@@ -872,3 +872,8 @@ $route['m-franchise-payment-transaction'] = 'atom_payment/Recharge_wallet/transa
 $route['franchise/change_password']         = 'Franchise_manager/change_pass';
 $route['franchise/edit_profile/(:num)']            = 'Franchise_manager/Profile/$1';
 $route['franchise/update/profile/(:num)']          = 'Franchise_manager/update_profile/$1';
+
+// commission master
+
+$route['franchise/view-Commision'] 			= 'Franchise_manager/list_commision';
+$route['master_franchise/View_commision'] 		= 'Master_franchise_manager/list_commision';
