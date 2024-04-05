@@ -218,7 +218,7 @@ class Master_franchise_menifiest extends CI_Controller
 							'forworder_name' => $this->input->post('forwarder_name'),
 							'remarks' => $this->input->post('note'),
 							'booking_id' => $booking_id,
-							'added_branch' => $branch_name,
+							'added_branch' => $locaion,
 							'tracking_date' => date('Y-m-d H:i:s', strtotime($this->input->post('datetime'))),
 						);
 						$result1	=	$this->basic_operation_m->insert('tbl_domestic_tracking', $data1);
