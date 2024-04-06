@@ -124,6 +124,8 @@ $route['franchise/b2b_pricing']                    = 'Franchise_manager/b2b_pric
 $route['franchise/cod_remittance']                 = 'Franchise_manager/cod_remittance';
 $route['franchise/credit-note']                    = 'Franchise_manager/credit_note';
 $route['franchise/wallet-transaction']             = 'Franchise_manager/wallet_transaction';
+$route['franchise/statment-d']                     = 'Franchise_manager/downloadStatment';
+$route['master-franchise/statment-d']              = 'Master_franchise_manager/downloadStatment';
 
 $route['franchise/shipping-charges']               = 'Franchise_manager/shipping_charges';
 $route['franchise/invoice']                        = 'Franchise_manager/invoice';

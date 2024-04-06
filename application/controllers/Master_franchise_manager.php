@@ -1638,6 +1638,40 @@ class Master_franchise_manager extends CI_Controller
 		$this->load->view('masterfranchise/booking_master/shipment_list', $data);
 	}
 
+	public function downloadStatment()
+	{
+		header("Content-Description: File Transfer");
+		$date = date('d-m-Y');
+		$filename = "WalletTransection_" . $date . ".csv";
+		$fp = fopen('php://output', 'w');
+
+		$header = array("Date", "TXN Type", "Ref No", "Transection Id", "Credit", "Debit", "Closing Balance");
+		header('Content-type: application/csv');
+		header('Content-Disposition: attachment; filename=' . $filename);		
+		$file = fopen('php://output', 'w');
+		fputcsv($fp, $header);
+		$customer_id = $_SESSION['customer_id'];
+		$wallet = $this->db->query("select wallet from tbl_customers where customer_id = '$customer_id'")->row();
+		$credit_limit = $this->db->query("Select * from tbl_franchise where fid = '$customer_id'")->row();
+		$transaction_data = $this->db->query("select * from franchise_topup_balance_tbl where customer_id = '$customer_id' order by topup_balance_id desc")->result_array();
+		$data1 = ["Credit Limit : ".$credit_limit->credit_limit - $credit_limit->credit_limit_utilize,"Wallet Balance :".$wallet->wallet];
+		foreach ($transaction_data as $row) {
+			$data = array(
+				$row['c_date'],
+				$row['payment_mode'],
+				$row['refrence_no'],
+				$row['transaction_id'],
+				$row['credit_amount'],
+				$row['debit_amount'],
+				$row['balance_amount']
+			);
+			fputcsv($file, $data);
+		}		
+		fputcsv($file, $data1);
+		fclose($file);
+		exit;
+	}
+
  
 } 
 

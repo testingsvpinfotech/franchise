@@ -1580,6 +1580,12 @@ class Franchise_manager extends CI_Controller
 		$this->load->view('franchise/booking_master/shipment_list', $data);
 	}
 
+	public function wallet_transaction()
+	{
+		$customer_id = $this->session->userdata('customer_id');
+		$data['transaction_data'] = $this->db->query("select * from franchise_topup_balance_tbl where customer_id = '$customer_id' order by topup_balance_id desc")->result();
+		$this->load->view('franchise/billing_master/wallet-transaction', $data);
+	}
 
     public function list_commision($offset = 0, $searching = ''){
 
@@ -1678,58 +1684,39 @@ class Franchise_manager extends CI_Controller
 
 		exit;
 	}
+	public function downloadStatment()
+	{
+		header("Content-Description: File Transfer");
+		$date = date('d-m-Y');
+		$filename = "WalletTransection_" . $date . ".csv";
+		$fp = fopen('php://output', 'w');
 
-
-
-
-
-	//         $date=date('d-m-Y');
-	// 		$filename = "SipmentDetails_".$date.".csv";
-	// 		$fp = fopen('php://output', 'w');
-
-	// 		$header =array("AWB No.","Sender","Receiver","Receiver City","Booking date","Mode","Pay Mode","Amount","Weight","NOP","Invoice No","Invoice Amount","Branch Name","User","Eway No","Eway Expiry date");
-
-
-	// 		header('Content-type: application/csv');
-	// 		header('Content-Disposition: attachment; filename='.$filename);
-
-	// 		fputcsv($fp, $header);
-	// 		$i =0;
-
-	// 		foreach($download_report_query as $row) 
-	// 		{
-	// 		    $whr=array('id'=>$row['sender_city']);
-	// 			$sender_city_details = $this->basic_operation_m->get_table_row("city",$whr);
-	// 			$sender_city = $sender_city_details->city;
-
-	// 			$whr_s=array('id'=>$row['reciever_state']);
-	// 			$reciever_state_details = $this->basic_operation_m->get_table_row("state",$whr_s);
-	// 			$reciever_state = $reciever_state_details->state;
-
-	// 			$whr_p=array('id'=>$row['payment_method']);
-	// 			$payment_method_details = $this->basic_operation_m->get_table_row("payment_method",$whr_p);
-	// 			$payment_method = $payment_method_details->method;
-
-
-	// 		   	$row=array(
-	// 		        $row['pod_no'],
-	// 				$row['sender_name'],
-	// 				$row['reciever_name'],
-	// 				$row['city'],
-	// 				$row['booking_date'],
-	// 				$mode_details->mode_name,
-	// 				$row['dispatch_details'],
-	// 				//$row['grand_total'],
-	// 			//	$row['chargable_weight'],
-	// 			//	$row['no_of_pack'],
-	// 				$row['invoice_no'],
-	// 				$row['invoice_value'],
-	// 			//	$branch_details->branch_name,
-	// 				//$user_details->username  
-	// 		    );
-	// 		   	fputcsv($fp, $row); 
-	// 		}
-	//     }
+		$header = array("Date", "TXN Type", "Ref No", "Transection Id", "Credit", "Debit", "Closing Balance");
+		header('Content-type: application/csv');
+		header('Content-Disposition: attachment; filename=' . $filename);		
+		$file = fopen('php://output', 'w');
+		fputcsv($fp, $header);
+		$customer_id = $_SESSION['customer_id'];
+		$wallet = $this->db->query("select wallet from tbl_customers where customer_id = '$customer_id'")->row();
+		$credit_limit = $this->db->query("Select * from tbl_franchise where fid = '$customer_id'")->row();
+		$transaction_data = $this->db->query("select * from franchise_topup_balance_tbl where customer_id = '$customer_id' order by topup_balance_id desc")->result_array();
+		$data1 = ["Credit Limit : ".$credit_limit->credit_limit - $credit_limit->credit_limit_utilize,"Wallet Balance :".$wallet->wallet];
+		foreach ($transaction_data as $row) {
+			$data = array(
+				$row['c_date'],
+				$row['payment_mode'],
+				$row['refrence_no'],
+				$row['transaction_id'],
+				$row['credit_amount'],
+				$row['debit_amount'],
+				$row['balance_amount']
+			);
+			fputcsv($file, $data);
+		}		
+		fputcsv($file, $data1);
+		fclose($file);
+		exit;
+	}
 
 	public function view_booking_shipment()
 	{
@@ -1853,14 +1840,7 @@ class Franchise_manager extends CI_Controller
 		$this->load->view('franchise/billing_master/credit-note');
 	}
 
-	public function wallet_transaction()
-	{
-		$customer_id = $this->session->userdata('customer_id');
-		$data['transaction_data'] = $this->db->query("select * from franchise_topup_balance_tbl where customer_id = '$customer_id' order by topup_balance_id desc")->result();
-
-		$this->load->view('franchise/billing_master/wallet-transaction', $data);
-	}
-
+	
 	public function shipping_charges()
 	{
 

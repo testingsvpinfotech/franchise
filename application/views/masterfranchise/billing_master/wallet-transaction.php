@@ -61,12 +61,21 @@
                                         <div class="col-sm-5 text-center">
                                             <?php $customer_id = $this->session->userdata('customer_id');
                                               $wallet = $this->db->query("select wallet from tbl_customers where customer_id = '$customer_id'")->row();
+                                              $credit_limit = $this->db->query("Select * from tbl_franchise where fid = '$customer_id'")->row();
                                             ?>
-                                            <h6>Wallet Balance: <b>₹<?php echo $wallet->wallet ;?> </b></h6>
                                         </div>
+                                        
                                     </div>
 
                                     <table class="table table-sm mt-4 ">
+                                    <a href="<?= base_url('master-franchise/statment-d');?>" class="btn btn-primary" >Download</a>
+                                        <thead>
+                                            <tr style = "background:#ddd;">
+                                                <th colspan="5">Credit Balance: ₹<?php echo $credit_limit->credit_limit - $credit_limit->credit_limit_utilize;?></th>
+                                                <th colspan="5">Wallet Balance: ₹<?php echo $wallet->wallet ;?></th>
+                                                <!-- <th>Description</th> -->
+                                            </tr>
+                                        </thead>
                                         <thead>
                                             <tr style = "background:#ddd;">
                                                 <th>Date</th>
