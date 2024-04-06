@@ -28,7 +28,7 @@
 
                         <div class="table-responsive">
 
-                            <form action="<?php echo base_url('franchise/view-Commision'); ?>" method="GET">
+                            <!-- <form action="<?php echo base_url('franchise/view-Commision'); ?>" method="GET">
                                 <div class="row mb-3" style="margin-left:0px;margin-right:0px;">
                                     <div class="col-md-2">
                                         <label for="">Filter</label>
@@ -63,7 +63,7 @@
                                             class="btn btn-info">Reset</a>
                                     </div>
                                 </div>
-                            </form>
+                            </form> -->
 
                             <table id="id1" class="display table  table-responsive table-striped table-bordered">
                                 <thead>
