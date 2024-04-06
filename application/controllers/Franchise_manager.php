@@ -81,11 +81,6 @@ class Franchise_manager extends CI_Controller
 }
 
 
-	public function list_commision(){
-		$data['shipment_info'] = $this->db->query("SELECT * FROM tbl_franchise_comission WHERE franchise_id = '".$_SESSION['customer_id']."'")->result_array();
-		$this->load->view('franchise/booking_master/view_commision',$data);
-	}
-
 	public function change_pass()
 	{
 		if ($this->input->server('REQUEST_METHOD') == 'POST') {
@@ -1154,6 +1149,7 @@ class Franchise_manager extends CI_Controller
 		$this->load->view('franchise/booking_master/edit_shipment', $data);
 	}
 
+
 	public function update_shipment($id)
 	{
 		$all_data = $this->input->post();
@@ -1570,8 +1566,6 @@ class Franchise_manager extends CI_Controller
 		}
 
 		if (isset($_POST['download_report']) && $_POST['download_report'] == 'Excel') {
-
-
 			$resActtt = $this->db->query($download_query);
 			$shipment_data = $resActtt->result_array();
 			$this->download_domestic_shipmentreport($shipment_data);
@@ -1587,6 +1581,34 @@ class Franchise_manager extends CI_Controller
 	}
 
 
+    public function list_commision($offset = 0, $searching = ''){
+
+        $filterCond = '';
+		$all_data = $this->input->get();
+
+		if (!empty($all_data)) {
+			
+			$filter_value = $_GET['filter_value'];
+			print_r($all_data);	die;
+				foreach ($all_data as $key => $val) {
+					if ($key == 'filter' && !empty($val)) {
+
+					if ($val == 'pod_no') {
+						$filterCond .= " AND tbl_domestic_booking.pod_no = '$filter_value'";
+					}
+					elseif ($key == 'from_date' && !empty($val)) {
+						$filterCond .= " AND tbl_domestic_booking.booking_date >= '$val' ";
+					} elseif ($key == 'to_date' && !empty($val)) {
+						$filterCond .= " AND tbl_domestic_booking.booking_date <= '$val'";
+					}
+				    }
+			}
+		}
+		
+		$data['shipment_info'] = $this->db->query("SELECT * FROM tbl_franchise_comission JOIN tbl_domestic_booking ON tbl_domestic_booking.pod_no = tbl_franchise_comission.pod_no WHERE tbl_franchise_comission.franchise_id = '".$_SESSION['customer_id']."' $filterCond")->result_array();
+		// echo $this->db->last_query();die;
+		$this->load->view('franchise/booking_master/view_commision',$data);
+}
 
 
 	public function download_domestic_shipmentreport($shipment_data)

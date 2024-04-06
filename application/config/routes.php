@@ -876,4 +876,5 @@ $route['franchise/update/profile/(:num)']          = 'Franchise_manager/update_p
 // commission master
 
 $route['franchise/view-Commision'] 			= 'Franchise_manager/list_commision';
+$route['franchise/view-Commision/(:num)'] 			= 'Franchise_manager/list_commision/$1';
 $route['master_franchise/View_commision'] 		= 'Master_franchise_manager/list_commision';
