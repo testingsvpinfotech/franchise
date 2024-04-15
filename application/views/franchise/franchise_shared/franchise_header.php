@@ -79,9 +79,12 @@
                          <li class="nav-item">
                             <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" data-html="true" data-original-title="" title="">Credit Balance ₹ <?= $credit_limit->credit_limit - $credit_limit->credit_limit_utilize;?></button>
                         </li>
+                         <li class="nav-item">
+                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" data-html="true" data-original-title="" title="">Credit Utilized ₹ <?= $credit_limit->credit_limit_utilize;?></button>
+                        </li>
                         <?php } ?>                       
                         </li>
-                    
+                         <?php  if($_SESSION['franchise_type']== 2){ ?>
                          <li class="nav-item"> <?php $value = $_SESSION['customer_id']; 
                          $balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
                          ?>
@@ -93,7 +96,7 @@
                             <a href="<?= base_url('atom_payment/Recharge_wallet/refresh_transcation');?>" title ="Faild Transaction Refresh" style="margin-top:2px;"><img src="<?= base_url('assets/update_icon.png');?>" width="40px"></a>
                             <?php } ?>
                         </li> 
-                          
+                          <?php } ?>
                        
                          <li class="nav-item ">
                             <button class="btn btn-sm btn-success" style="background:#12263f!important;border: 1px solid #12263f!important;" data-toggle="modal" data-target="#myModal"><i class="mdi mdi-flash"></i> Recharge</button>
