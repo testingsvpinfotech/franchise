@@ -946,6 +946,7 @@ class Franchise_manager extends CI_Controller
 				'sender_contactno' => $this->input->post('sender_contactno'),
 				'sender_gstno' => $this->input->post('sender_gstno'),
 				'reciever_name' => $this->input->post('reciever_name'),
+				'door_delivery_acces' => $this->input->post('door_delivery_acces'),
 				'contactperson_name' => $this->input->post('contactperson_name'),
 				'reciever_address' => $this->input->post('reciever_address'),
 				'reciever_contact' => $this->input->post('reciever_contact'),
@@ -1008,27 +1009,21 @@ class Franchise_manager extends CI_Controller
 					'customer_id'=>EmptyVal($this->input->post('customer_id')),
 					'pod_no'=>$pod_no,
 					'booking_commision'=>EmptyVal($this->input->post('booking_comission')),
-					'delivery_commision'=>EmptyVal($this->input->post('delivery_commission')),
-					'door_delivery_share'=>EmptyVal($this->input->post('door_delivery_share')),
 					'booking_commision_charges'=>EmptyVal($this->input->post('booking_charges')),
-					'delivery_commision_charges'=>EmptyVal($this->input->post('delivery_c_charges')),
-					'door_delivery_charges'=>EmptyVal($this->input->post('door_delivery_charges')),
-					'total_charges'=>$total_charges,
+					'total_charges'=>EmptyVal($this->input->post('booking_charges')),
 					'booking_date'=>$date
 				];
 				if(!empty($this->input->post('booking_charges'))){
 					$commision['booking_commision_access']= 1;
 				}
-				if(!empty($this->input->post('delivery_c_charges'))){
-					$commision['delivery_commision_access']= 1;
-				}
-				if(!empty($this->input->post('door_delivery_charges'))){
-					$commision['door_delivery_access']= 1;
-				}	
 				if($this->input->post('dispatch_details')=='TOPAY'){
 					$commision['booking_type']= 1;
 				}			
+				$cust_id = $_SESSION['customer_id'];
+				 $comission_wallet = $this->db->query("SELECT * FROM tbl_customers where customer_id = '$cust_id'")->row('commision_wallet');
+				$wallet_c =  $comission_wallet + EmptyVal($this->input->post('booking_charges'));
 				$this->basic_operation_m->insert('tbl_franchise_comission', $commision);
+				$this->basic_operation_m->update('tbl_customers',['commision_wallet'=>$wallet_c], ['customer_id'=>EmptyVal($this->input->post('customer_id'))]);
 				
 				$weight_data = array(
 					'per_box_weight_detail' => $all_Data['per_box_weight_detail'],

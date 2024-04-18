@@ -101,89 +101,94 @@ ini_set('display_errors', 1);
 						$booking_data = $this->db->get_where('tbl_domestic_booking', ['booking_id' => $this->input->post('selected_dockets')])->row();				
 						$cust = $this->db->get_where('tbl_customers', ['customer_id' => $booking_data->customer_id])->row();				
 						
+						if($booking_data->bnf_customer_id !=0){ 
+							
+							CommssionDeduct($booking_data,$_SESSION['customer_id']);
+						
+						}
 						if ($booking_data->dispatch_details == "TOPAY" || $booking_data->dispatch_details == "ToPay") {
-							if($booking_data->bnf_customer_id !=0){ $status1 = 1;}else{$status1 =0;}
+							// if($booking_data->bnf_customer_id !=0){ $status1 = 1;}else{$status1 =0;}
 							// print_r($status1);die;
-							  TopayDeduct($selected_dockets,$status1);
-							$branch_info = $this->basic_operation_m->getAll('tbl_branch', array('branch_id' => 1))->row();
-							$code = $this->booking_model->get_invoice_max_id('tbl_domestic_invoice', 'invoice_no', substr($branch_info->branch_code, -2), $booking_data->dispatch_details);
-							$date = date('Y-m-d');
-							if (date('m', strtotime($date)) <= 3) {
-								$year = (date('Y') - 1) . '-' . (date('Y'));
-							} else {
-								$year = (date('Y')) . '-' . (date('Y') + 1);
-							}
-							$max_number = $this->basic_operation_m->get_max_number('tbl_domestic_invoice', 'MAX(inc_num) AS id');
-							if (!empty($max_number) && !empty($max_number->id)) {
-								$inc_num = (($max_number->id) + 1);
-							} else {
-								$inc_num = 52;
-							}
-							$invoice['invoice_no'] = $code;
-							$data['company_details'] = $this->basic_operation_m->get_table_row('tbl_company', array('id' => 1));
-							$invoice_series = $branch_info->domestic_invoice_series;
-							$invoice['inc_num'] = $inc_num;
-							$invoice['invoice_number'] = $code;
-							$invoice['invoice_date'] = date("Y-m-d");
-							$invoice['consigner_name'] = $booking_data->reciever_name;
-							$invoice['consigner_address'] = $booking_data->reciever_address;
-							$invoice['consigner_city'] = $booking_data->reciever_city;
-							$invoice['consigner_gstno'] = $booking_data->receiver_gstno;
-							$invoice['consigner_phone'] = $booking_data->reciever_contact;
-							$invoice['address'] = $branch_info->address;
-							$invoice['city'] = isset($city_data->city) ? $city_data->city : "";
-							$invoice['gstno'] = $branch_info->gst_number;
-							// $invoice['customer_id'] = $booking_data->customer_id;
-							$invoice['invoice_from_date'] = date('Y-m-d');
-							$invoice['invoice_to_date'] = date('Y-m-d');
-							$invoice['booking_ids'] = json_encode($booking_data->booking_id);
-							// $invoice['payment_type'] = $this->input->post('pay_mode');
-							$invoice['branch_id'] = $booking_data->branch_id;
-							$invoice['createId'] = 1;
-							$invoice['createDtm'] = date('Y-m-d H:i:s');
-							$invoice['payment_type'] = 'TOPAY';
-							$invoice['final_invoice'] = 1;
-							$invoice['fin_year'] = '2023-2024';
-							$invoice['cgst_amount'] = $booking_data->cgst;
-							$invoice['sgst_amount'] = $booking_data->sgst;
-							$invoice['igst_amount'] = $booking_data->igst;
-							$invoice['total_amount'] = $booking_data->grand_total;
-							$invoice['sub_total'] = $booking_data->sub_total;
-							$invoice['grand_total'] = $booking_data->grand_total;
-							$whr_c = array('id' => $booking_data->reciever_city);
-							$rec_city = $this->basic_operation_m->get_table_row('city', $whr_c);
-							// echo "<pre>"; print_r($invoice); die;
-							$this->db->insert('tbl_domestic_invoice', $invoice);
-							// echo $this->db->last_query();die;
-							$invoice_id = $this->db->insert_id();
-							if (!empty($invoice_id)) {
-								$weight = $this->db->get_where('tbl_domestic_weight_details', ['booking_id' => $booking_data->booking_id])->row();
-								$invoice_detail['invoice_id'] = $invoice_id;
-								$invoice_detail['booking_id'] = $booking_data->booking_id;
-								$invoice_detail['booking_date'] = $booking_data->booking_date;
-								$invoice_detail['pod_no'] = $booking_data->pod_no;
-								$invoice_detail['doc_type'] = $booking_data->doc_type;
-								$invoice_detail['reciever_name'] = $booking_data->reciever_name;
-								$invoice_detail['reciever_city'] = $rec_city->city;
-								$invoice_detail['mode_dispatch'] = $booking_data->mode_dispatch;
-								$invoice_detail['forwording_no'] = !empty($booking_data->forwording_no) ? $booking_data->forwording_no : "";
-								$invoice_detail['forworder_name'] = $booking_data->forworder_name;
-								$invoice_detail['no_of_pack'] = !empty($weight) ? $weight->no_of_pack : '';
-								$invoice_detail['chargable_weight'] = isset($weight) ? $weight->chargable_weight : "";
-								$invoice_detail['transportation_charges'] = $booking_data->transportation_charges;
-								$invoice_detail['pickup_charges'] = $booking_data->pickup_charges;
-								$invoice_detail['delivery_charges'] = $booking_data->delivery_charges;
-								$invoice_detail['courier_charges'] = $booking_data->courier_charges;
-								$invoice_detail['awb_charges'] = $booking_data->awb_charges;
-								$invoice_detail['other_charges'] = $booking_data->other_charges;
-								$invoice_detail['frieht'] = $booking_data->frieht;
-								$invoice_detail['amount'] = $booking_data->total_amount;
-								$invoice_detail['fuel_subcharges'] = $booking_data->fuel_subcharges;
-								$invoice_detail['invoice_value'] = $booking_data->invoice_value;
-								$invoice_detail['sub_total'] = $booking_data->sub_total;
+							  TopayDeduct($selected_dockets,0);
+							// $branch_info = $this->basic_operation_m->getAll('tbl_branch', array('branch_id' => 1))->row();
+							// $code = $this->booking_model->get_invoice_max_id('tbl_domestic_invoice', 'invoice_no', substr($branch_info->branch_code, -2), $booking_data->dispatch_details);
+							// $date = date('Y-m-d');
+							// if (date('m', strtotime($date)) <= 3) {
+							// 	$year = (date('Y') - 1) . '-' . (date('Y'));
+							// } else {
+							// 	$year = (date('Y')) . '-' . (date('Y') + 1);
+							// }
+							// $max_number = $this->basic_operation_m->get_max_number('tbl_domestic_invoice', 'MAX(inc_num) AS id');
+							// if (!empty($max_number) && !empty($max_number->id)) {
+							// 	$inc_num = (($max_number->id) + 1);
+							// } else {
+							// 	$inc_num = 52;
+							// }
+							// $invoice['invoice_no'] = $code;
+							// $data['company_details'] = $this->basic_operation_m->get_table_row('tbl_company', array('id' => 1));
+							// $invoice_series = $branch_info->domestic_invoice_series;
+							// $invoice['inc_num'] = $inc_num;
+							// $invoice['invoice_number'] = $code;
+							// $invoice['invoice_date'] = date("Y-m-d");
+							// $invoice['consigner_name'] = $booking_data->reciever_name;
+							// $invoice['consigner_address'] = $booking_data->reciever_address;
+							// $invoice['consigner_city'] = $booking_data->reciever_city;
+							// $invoice['consigner_gstno'] = $booking_data->receiver_gstno;
+							// $invoice['consigner_phone'] = $booking_data->reciever_contact;
+							// $invoice['address'] = $branch_info->address;
+							// $invoice['city'] = isset($city_data->city) ? $city_data->city : "";
+							// $invoice['gstno'] = $branch_info->gst_number;
+							// // $invoice['customer_id'] = $booking_data->customer_id;
+							// $invoice['invoice_from_date'] = date('Y-m-d');
+							// $invoice['invoice_to_date'] = date('Y-m-d');
+							// $invoice['booking_ids'] = json_encode($booking_data->booking_id);
+							// // $invoice['payment_type'] = $this->input->post('pay_mode');
+							// $invoice['branch_id'] = $booking_data->branch_id;
+							// $invoice['createId'] = 1;
+							// $invoice['createDtm'] = date('Y-m-d H:i:s');
+							// $invoice['payment_type'] = 'TOPAY';
+							// $invoice['final_invoice'] = 1;
+							// $invoice['fin_year'] = '2023-2024';
+							// $invoice['cgst_amount'] = $booking_data->cgst;
+							// $invoice['sgst_amount'] = $booking_data->sgst;
+							// $invoice['igst_amount'] = $booking_data->igst;
+							// $invoice['total_amount'] = $booking_data->grand_total;
+							// $invoice['sub_total'] = $booking_data->sub_total;
+							// $invoice['grand_total'] = $booking_data->grand_total;
+							// $whr_c = array('id' => $booking_data->reciever_city);
+							// $rec_city = $this->basic_operation_m->get_table_row('city', $whr_c);
+							// // echo "<pre>"; print_r($invoice); die;
+							// $this->db->insert('tbl_domestic_invoice', $invoice);
+							// // echo $this->db->last_query();die;
+							// $invoice_id = $this->db->insert_id();
+							// if (!empty($invoice_id)) {
+							// 	$weight = $this->db->get_where('tbl_domestic_weight_details', ['booking_id' => $booking_data->booking_id])->row();
+							// 	$invoice_detail['invoice_id'] = $invoice_id;
+							// 	$invoice_detail['booking_id'] = $booking_data->booking_id;
+							// 	$invoice_detail['booking_date'] = $booking_data->booking_date;
+							// 	$invoice_detail['pod_no'] = $booking_data->pod_no;
+							// 	$invoice_detail['doc_type'] = $booking_data->doc_type;
+							// 	$invoice_detail['reciever_name'] = $booking_data->reciever_name;
+							// 	$invoice_detail['reciever_city'] = $rec_city->city;
+							// 	$invoice_detail['mode_dispatch'] = $booking_data->mode_dispatch;
+							// 	$invoice_detail['forwording_no'] = !empty($booking_data->forwording_no) ? $booking_data->forwording_no : "";
+							// 	$invoice_detail['forworder_name'] = $booking_data->forworder_name;
+							// 	$invoice_detail['no_of_pack'] = !empty($weight) ? $weight->no_of_pack : '';
+							// 	$invoice_detail['chargable_weight'] = isset($weight) ? $weight->chargable_weight : "";
+							// 	$invoice_detail['transportation_charges'] = $booking_data->transportation_charges;
+							// 	$invoice_detail['pickup_charges'] = $booking_data->pickup_charges;
+							// 	$invoice_detail['delivery_charges'] = $booking_data->delivery_charges;
+							// 	$invoice_detail['courier_charges'] = $booking_data->courier_charges;
+							// 	$invoice_detail['awb_charges'] = $booking_data->awb_charges;
+							// 	$invoice_detail['other_charges'] = $booking_data->other_charges;
+							// 	$invoice_detail['frieht'] = $booking_data->frieht;
+							// 	$invoice_detail['amount'] = $booking_data->total_amount;
+							// 	$invoice_detail['fuel_subcharges'] = $booking_data->fuel_subcharges;
+							// 	$invoice_detail['invoice_value'] = $booking_data->invoice_value;
+							// 	$invoice_detail['sub_total'] = $booking_data->sub_total;
 
-								$this->db->insert('tbl_domestic_invoice_detail', $invoice_detail);
-							}
+							// 	$this->db->insert('tbl_domestic_invoice_detail', $invoice_detail);
+							// }
 						}
 
 

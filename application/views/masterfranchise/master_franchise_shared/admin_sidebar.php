@@ -3,7 +3,7 @@
             <div class="loader"></div>
         </div>
         START: Header-->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div id="header-fix" class="header fixed-top ">
     <div class="site-width">
         <nav class="navbar navbar-expand-lg  p-0">
@@ -26,23 +26,30 @@
                                         <?php $value = $_SESSION['customer_id'];
                                         $balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
                                         // echo $this->db->last_query();
-                                        ?><button class="btn btn-sm btn-light" data-toggle="tooltip" data-html="true"
+                                        ?>
+                                        <?php if ($_SESSION['franchise_type'] == 1 || $_SESSION['franchise_type'] == 3) {
+                                            $value = $_SESSION['customer_id'];
+                                            $credit_limit = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
+                                            ?>
+                                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" disabled
+                                                data-html="true" data-original-title="" title="">Credit Balance ₹
+                                                <?= $credit_limit->credit_limit - $credit_limit->credit_limit_utilize; ?></button><br>
+                                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" disabled
+                                                data-html="true" data-original-title="" title="">Utilize Balance ₹
+                                                <?= $credit_limit->credit_limit_utilize; ?></button>
+                                        <?php }else{ ?>
+                                            <button class="btn btn-sm btn-light" data-toggle="tooltip" data-html="true"
                                             data-original-title="" title="" disabled>Wallet Balance ₹
                                             <?= $balance->wallet; ?>
                                         </button>
-                                        <?php if($_SESSION['franchise_type']==1 ||$_SESSION['franchise_type']==3){ 
-                                            $value = $_SESSION['customer_id']; 
-                                            $credit_limit = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
-                                            ?>
-                                            <br>
-                                            <button class="btn btn-sm btn-light mr-1" data-toggle="tooltip" disabled data-html="true" data-original-title="" title="">Credit Balance ₹ <?= $credit_limit->credit_limit - $credit_limit->credit_limit_utilize;?></button>
-                                        <?php } ?>      
-                                        <?php  $customer_id = $_SESSION['customer_id'];        
-                            $transection = $this->db->query("SELECT * FROM tbl_wallet_recharge_transection WHERE status ='0' AND customer_id = '$customer_id'")->row();    
-                            if(!empty($transection))
-                            { ?>
-                            <a href="<?= base_url('atom_payment/Recharge_wallet/refresh_transcation');?>" title ="Click to Refresh" style="margin-top:2px;"><img src="<?= base_url('assets/update_icon.png');?>" width="40px"></a>
-                            <?php } ?>
+                                        <?php } ?>
+                                        <?php $customer_id = $_SESSION['customer_id'];
+                                        $transection = $this->db->query("SELECT * FROM tbl_wallet_recharge_transection WHERE status ='0' AND customer_id = '$customer_id'")->row();
+                                        if (!empty($transection)) { ?>
+                                            <a href="<?= base_url('atom_payment/Recharge_wallet/refresh_transcation'); ?>"
+                                                title="Click to Refresh" style="margin-top:2px;"><img
+                                                    src="<?= base_url('assets/update_icon.png'); ?>" width="40px"></a>
+                                        <?php } ?>
                                     </li>
                                     <li class="nav-item">
                                         <a class="btn btn-sm btn-success"
@@ -61,7 +68,7 @@
                                         <button class="btn btn-sm btn-success"
                                             style="background:#12263f!important;border: 1px solid #12263f!important;"
                                             data-toggle="modal" data-target="#myModal">Recharge</button>
-                                          
+
                                     </li>
                                     <li class="active"><a href="<?= base_url('master_franchise/dashboard'); ?>"><i
                                                 class="icon-home mr-1"></i> Dashboard</a></li>
@@ -108,7 +115,8 @@
                                             href="<?= base_url('master_franchise/franchise-list'); ?>">Unit
                                             Franchise List</a></li>
                                     <li class="active"><a
-                                            href="<?= base_url('master_franchise/View_commision'); ?>">View Commission</a></li>
+                                            href="<?= base_url('master_franchise/View_commision'); ?>">View
+                                            Commission</a></li>
                                     <li class="active"><a href="<?= base_url('m-franchise-payment-transaction'); ?>">
                                             Payment Gateway Transection
                                         </a></li>
@@ -198,7 +206,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                Recharge Your Wallet
+                    Recharge Your Wallet
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <i class="icon-close"></i>
@@ -207,13 +215,13 @@
             <form action="<?= base_url('pay-franchise-amount'); ?>" method="POST">
                 <div class="modal-body">
                     <div class="row">
-                    <div class="col-md-12">
-                                <div class="contact-occupation">
-                                    <label for="contact-occupation" class="col-form-label">Enter Amount</label>
-                                    <input type="number" min="500" step="any" placeholder="Enter Credit Amounts"
-                                        name="recharge_wallet" id="recharge_wallet" class="form-control" required>
-                                </div>
+                        <div class="col-md-12">
+                            <div class="contact-occupation">
+                                <label for="contact-occupation" class="col-form-label">Enter Amount</label>
+                                <input type="number" min="500" step="any" placeholder="Enter Credit Amounts"
+                                    name="recharge_wallet" id="recharge_wallet" class="form-control" required>
                             </div>
+                        </div>
                     </div>
 
                 </div>

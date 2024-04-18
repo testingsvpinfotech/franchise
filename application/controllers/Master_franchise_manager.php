@@ -484,7 +484,69 @@ class Master_franchise_manager extends CI_Controller
  
 				if($this->input->post('dispatch_details')!='TOPAY'){
 					if ($this->input->post('grand_total') != '') {
-						//$value = $_SESSION['customer_id'];
+						// credit franchise walking customer booking 
+						if($_SESSION['franchise_type']== 1 || $_SESSION['franchise_type'] ==3){
+							if(empty($all_Data['customer_id'])){
+								$query = "SELECT MAX(topup_balance_id) as id FROM franchise_topup_balance_tbl ";
+								$result1 = $this->basic_operation_m->get_query_row($query);
+								$id = $result1->id + 1;
+								$franchise_id1 = $balance->franchise_id;
+								$payment_mode = 'Debit';
+								$bank_name = 'Current';				
+								if (strlen($id) == 1) {
+									$franchise_id = 'BFT100000' . $id;
+								} elseif (strlen($id) == 2) {
+									$franchise_id = 'BFT10000' . $id;
+								} elseif (strlen($id) == 3) {
+									$franchise_id = 'BFT1000' . $id;
+								} elseif (strlen($id) == 4) {
+									$franchise_id = 'BFT100' . $id;
+								} elseif (strlen($id) == 5) {
+									$franchise_id = 'BFT1000' . $id;
+								}
+								if($this->input->post('dispatch_details')!='TOPAY'){
+									if ($this->input->post('grand_total') != '') {
+										$value = $this->session->userdata('customer_id');
+										$g_total = $this->input->post('grand_total');
+										$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
+										$cust = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
+										$amount = $balance->credit_limit_utilize;
+										$update_val = $amount + $this->input->post('grand_total');
+										$whr5 = array('fid' => $_SESSION['customer_id']);
+										$data1 = array('credit_limit_utilize' => $update_val);
+										$result = $this->basic_operation_m->update('tbl_franchise', $data1, $whr5);									
+										$franchise_id1 = $cust->cid;
+											$data9 = array(
+											'franchise_id' => $franchise_id1,
+											'customer_id' => $user_id,
+											'transaction_id' => $franchise_id,
+											'payment_date' => $date,
+											'debit_amount' => $g_total,
+											'balance_amount' => $update_val,
+											'payment_mode' => $payment_mode,
+											'bank_name' => $bank_name,
+											'status' => 1,
+											'franchise_type' =>$_SESSION['franchise_type'] ,
+											'refrence_no' => $pod_no
+										);
+										$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
+									}
+								}else{
+									$value = $this->session->userdata('customer_id');
+									$g_total = $this->input->post('grand_total1');
+									$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row('credit_limit_utilize');
+									$ShipmentDeducted = $balance + $g_total;
+									if($ShipmentDeducted < -1001){
+										$msg = "You Dont Have sufficient Balance!";
+										$class = 'alert alert-danger alert-dismissible';  
+										$this->session->set_flashdata('notify', $msg);
+										$this->session->set_flashdata('class', $class);
+										redirect('franchise/shipment-list');
+									}
+						        }
+							}
+						}else{
+                        // prepaid franchise booking
 						$value = $this->session->userdata('customer_id');
 						$g_total = $this->input->post('grand_total');
 						$balance = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
@@ -507,6 +569,7 @@ class Master_franchise_manager extends CI_Controller
 							'refrence_no' => $pod_no
 						);
 						$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
+				    	}
 					}
 			   }else{
 					$value = $this->session->userdata('customer_id');
@@ -518,7 +581,7 @@ class Master_franchise_manager extends CI_Controller
 						$class = 'alert alert-danger alert-dismissible';  
 						$this->session->set_flashdata('notify', $msg);
 						$this->session->set_flashdata('class', $class);
-						redirect('master-franchise/shipment-list');
+						redirect('franchise/shipment-list');
 					}
 			   }
 			}
@@ -651,6 +714,7 @@ class Master_franchise_manager extends CI_Controller
 				'sender_contactno' => $this->input->post('sender_contactno'),
 				'sender_gstno' => $this->input->post('sender_gstno'),
 				'reciever_name' => $this->input->post('reciever_name'),
+				'door_delivery_acces' => $this->input->post('door_delivery_acces'),
 				'contactperson_name' => $this->input->post('contactperson_name'),
 				'reciever_address' => $this->input->post('reciever_address'),
 				'reciever_contact' => $this->input->post('reciever_contact'),
@@ -713,27 +777,21 @@ class Master_franchise_manager extends CI_Controller
 					'customer_id'=>EmptyVal($this->input->post('customer_id')),
 					'pod_no'=>$pod_no,
 					'booking_commision'=>EmptyVal($this->input->post('booking_comission')),
-					'delivery_commision'=>EmptyVal($this->input->post('delivery_commission')),
-					'door_delivery_share'=>EmptyVal($this->input->post('door_delivery_share')),
 					'booking_commision_charges'=>EmptyVal($this->input->post('booking_charges')),
-					'delivery_commision_charges'=>EmptyVal($this->input->post('delivery_c_charges')),
-					'door_delivery_charges'=>EmptyVal($this->input->post('door_delivery_charges')),
-					'total_charges'=>$total_charges,
+					'total_charges'=>EmptyVal($this->input->post('booking_charges')),
 					'booking_date'=>$date
 				];
 				if(!empty($this->input->post('booking_charges'))){
 					$commision['booking_commision_access']= 1;
 				}
-				if(!empty($this->input->post('delivery_c_charges'))){
-					$commision['delivery_commision_access']= 1;
-				}
-				if(!empty($this->input->post('door_delivery_charges'))){
-					$commision['door_delivery_access']= 1;
-				}	
 				if($this->input->post('dispatch_details')=='TOPAY'){
 					$commision['booking_type']= 1;
 				}			
+				$cust_id = $_SESSION['customer_id'];
+				 $comission_wallet = $this->db->query("SELECT * FROM tbl_customers where customer_id = '$cust_id'")->row('commision_wallet');
+				$wallet_c =  $comission_wallet + EmptyVal($this->input->post('booking_charges'));
 				$this->basic_operation_m->insert('tbl_franchise_comission', $commision);
+				$this->basic_operation_m->update('tbl_customers',['commision_wallet'=>$wallet_c], ['customer_id'=>EmptyVal($this->input->post('customer_id'))]);
 				
 				$weight_data = array(
 					'per_box_weight_detail' => $all_Data['per_box_weight_detail'],
@@ -801,71 +859,69 @@ class Master_franchise_manager extends CI_Controller
 				}
 			}
 			if (!empty($result)) {
-			    $query = "SELECT MAX(topup_balance_id) as id FROM franchise_topup_balance_tbl ";
-				$result1 = $this->basic_operation_m->get_query_row($query);
-				$id = $result1->id + 1;
-				//print_r($id); exit;
+			//     $query = "SELECT MAX(topup_balance_id) as id FROM franchise_topup_balance_tbl ";
+			// 	$result1 = $this->basic_operation_m->get_query_row($query);
+			// 	$id = $result1->id + 1;
+			// 	//print_r($id); exit;
 
-				$franchise_id1 = $balance->franchise_id;
-				$payment_mode = 'Debit';
-				$bank_name = 'Current';
+			// 	$franchise_id1 = $balance->franchise_id;
+			// 	$payment_mode = 'Debit';
+			// 	$bank_name = 'Current';
 
-				if (strlen($id) == 1) {
-					$franchise_id = 'BFT100000' . $id;
-				} elseif (strlen($id) == 2) {
-					$franchise_id = 'BFT10000' . $id;
-				} elseif (strlen($id) == 3) {
-					$franchise_id = 'BFT1000' . $id;
-				} elseif (strlen($id) == 4) {
-					$franchise_id = 'BFT100' . $id;
-				} elseif (strlen($id) == 5) {
-					$franchise_id = 'BFT1000' . $id;
-				}
-				if($this->input->post('dispatch_details')!='TOPAY'){
-					if ($this->input->post('grand_total1') != '') {
-						//$value = $_SESSION['customer_id'];
-						$value = $this->session->userdata('customer_id');
-						$g_total = $this->input->post('grand_total1');
-						$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
-						$cust = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
-						$amount = $balance->credit_limit_utilize;
-						$update_val = $amount + $this->input->post('grand_total1');
-						$whr5 = array('fid' => $_SESSION['customer_id']);
-						$data1 = array('credit_limit_utilize' => $update_val);
-						$result = $this->basic_operation_m->update('tbl_franchise', $data1, $whr5);
+			// 	if (strlen($id) == 1) {
+			// 		$franchise_id = 'BFT100000' . $id;
+			// 	} elseif (strlen($id) == 2) {
+			// 		$franchise_id = 'BFT10000' . $id;
+			// 	} elseif (strlen($id) == 3) {
+			// 		$franchise_id = 'BFT1000' . $id;
+			// 	} elseif (strlen($id) == 4) {
+			// 		$franchise_id = 'BFT100' . $id;
+			// 	} elseif (strlen($id) == 5) {
+			// 		$franchise_id = 'BFT1000' . $id;
+			// 	}
+			// 	if($this->input->post('dispatch_details')!='TOPAY'){
+			// 		if ($this->input->post('grand_total1') != '') {
+			// 			//$value = $_SESSION['customer_id'];
+			// 			$value = $this->session->userdata('customer_id');
+			// 			$g_total = $this->input->post('grand_total1');
+			// 			$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
+			// 			$cust = $this->db->query("Select * from tbl_customers where customer_id = '$value'")->row();
+			// 			$amount = $balance->credit_limit_utilize;
+			// 			$update_val = $amount + $this->input->post('grand_total1');
+			// 			$whr5 = array('fid' => $_SESSION['customer_id']);
+			// 			$data1 = array('credit_limit_utilize' => $update_val);
+			// 			$result = $this->basic_operation_m->update('tbl_franchise', $data1, $whr5);
 					
-						$franchise_id1 = $cust->cid;
-							$data9 = array(
-							'franchise_id' => $franchise_id1,
-							'customer_id' => $user_id,
-							'transaction_id' => $franchise_id,
-							'payment_date' => $date,
-							'debit_amount' => $g_total,
-							'balance_amount' => $update_val,
-							'payment_mode' => $payment_mode,
-							'bank_name' => $bank_name,
-							'status' => 1,
-							'franchise_type' =>$_SESSION['franchise_type'] ,
-							'refrence_no' => $pod_no
-						);
-						$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
-						// echo $this->db->last_query();die;
-					}
-			    }else{
-					$value = $_SESSION['customer_id'];
-					// print_r($_SESSION['customer_id']);die;
-					$g_total = $this->input->post('grand_total1');
-					$balance = $this->db->query("select * from tbl_franchise where fid = '$value'")->row('credit_limit_utilize');
-					// echo $this->db->last_query();die;
-					$ShipmentDeducted = $balance + $g_total;
-					if($ShipmentDeducted < -1001){
-						$msg = "You Dont Have sufficient Balance!";
-						$class = 'alert alert-danger alert-dismissible';  
-						$this->session->set_flashdata('notify', $msg);
-						$this->session->set_flashdata('class', $class);
-						redirect('master-franchise/shipment-list');
-					}
-			   }
+			// 			$franchise_id1 = $cust->cid;
+			// 				$data9 = array(
+			// 				'franchise_id' => $franchise_id1,
+			// 				'customer_id' => $user_id,
+			// 				'transaction_id' => $franchise_id,
+			// 				'payment_date' => $date,
+			// 				'debit_amount' => $g_total,
+			// 				'balance_amount' => $update_val,
+			// 				'payment_mode' => $payment_mode,
+			// 				'bank_name' => $bank_name,
+			// 				'status' => 1,
+			// 				'franchise_type' =>$_SESSION['franchise_type'] ,
+			// 				'refrence_no' => $pod_no
+			// 			);
+			// 			$result = $this->db->insert('franchise_topup_balance_tbl', $data9);
+			// 			// echo $this->db->last_query();die;
+			// 		}
+			//     }else{
+			// 		$value = $this->session->userdata('customer_id');
+			// 		$g_total = $this->input->post('grand_total1');
+			// 		$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row('credit_limit_utilize');
+			// 		$ShipmentDeducted = $balance + $g_total;
+			// 		if($ShipmentDeducted < -1001){
+			// 			$msg = "You Dont Have sufficient Balance!";
+			// 			$class = 'alert alert-danger alert-dismissible';  
+			// 			$this->session->set_flashdata('notify', $msg);
+			// 			$this->session->set_flashdata('class', $class);
+			// 			redirect('master-franchise/shipment-list');
+			// 		}
+			//    }
 			}
 			$this->db->trans_complete();
 			if ($this->db->trans_status() === TRUE)
