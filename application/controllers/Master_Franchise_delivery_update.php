@@ -144,13 +144,14 @@ class Master_Franchise_delivery_update extends CI_Controller {
 							$invoice['createDtm'] = date('Y-m-d H:i:s');
 							$invoice['payment_type'] = 'TOPAY';
 							$invoice['final_invoice'] = 1;
-							$invoice['fin_year'] = '2023-2024';
+							$invoice['fin_year'] = '2024-2025';
 							$invoice['cgst_amount'] = $booking_data->cgst;
 							$invoice['sgst_amount'] = $booking_data->sgst;
 							$invoice['igst_amount'] = $booking_data->igst;
 							$invoice['total_amount'] = $booking_data->grand_total;
 							$invoice['sub_total'] = $booking_data->sub_total;
 							$invoice['grand_total'] = $booking_data->grand_total;
+							$invoice['franchise_id'] = $_SESSION['customer_id'];
 							$whr_c = array('id' => $booking_data->reciever_city);
 							$rec_city = $this->basic_operation_m->get_table_row('city', $whr_c);
 							// echo "<pre>"; print_r($invoice); die;

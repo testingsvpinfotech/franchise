@@ -155,6 +155,7 @@ ini_set('display_errors', 1);
 							$invoice['total_amount'] = $booking_data->grand_total;
 							$invoice['sub_total'] = $booking_data->sub_total;
 							$invoice['grand_total'] = $booking_data->grand_total;
+							$invoice['franchise_id'] = $_SESSION['customer_id'];
 							$whr_c = array('id' => $booking_data->reciever_city);
 							$rec_city = $this->basic_operation_m->get_table_row('city', $whr_c);
 							// echo "<pre>"; print_r($invoice); die;
