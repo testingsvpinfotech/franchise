@@ -482,6 +482,7 @@ class Franchise_manager extends CI_Controller
 			{
 				$branch_name = $branch;
 			}
+			// echo '<pre>'; print_r($_POST);exit;
 			if($_SESSION['franchise_type']== 1 || $_SESSION['franchise_type'] ==3){
                  if(!empty($all_Data['customer_id']) && $all_Data['company_customer']==1){
 					$this->CustomerBNF_insert($all_Data);
@@ -612,7 +613,7 @@ class Franchise_manager extends CI_Controller
 				'branch_id' => 0,
 				'booking_type' => 1
 			);
-			//echo '<pre>'; print_r($data);exit;
+			// echo '<pre>'; print_r($_POST);exit;
 			$this->db->trans_start();
 			$result = $this->db->insert('tbl_domestic_booking', $data);
             // echo $this->db->last_query();die;
@@ -966,7 +967,7 @@ class Franchise_manager extends CI_Controller
 				'booking_time' => date('H:i:s', strtotime($this->input->post('booking_date'))),
 				'dispatch_details' => $this->input->post('dispatch_details'),
 				'rate' => EmptyVal($this->input->post('rate')),
-				'frieht' => EmptyVal($this->input->post('frieht')),
+				'frieht' => EmptyVal($this->input->post('frieht1')),
 				'transportation_charges' => EmptyVal($this->input->post('transportation_charges1')),
 				'insurance_charges' => EmptyVal($this->input->post('insurance_charges1')),
 				'pickup_charges' => EmptyVal($this->input->post('pickup_charges1')),
@@ -3379,6 +3380,7 @@ class Franchise_manager extends CI_Controller
 		}
 		$whr1 = array('courier_id' => $c_courier_id, 'fuel_from <=' => $current_date, 'fuel_to >=' => $current_date, 'customer_id =' => $customer_id);
 		$res1 = $this->basic_operation_m->get_table_row('courier_fuel', $whr1);	
+		// echo $this->db->last_query();die;
 		$fovExpiry = "";
 		if ($res1) {
 			$fuel_per = $res1->fuel_price;

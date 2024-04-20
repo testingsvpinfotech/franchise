@@ -190,10 +190,10 @@ class FranchiseController extends CI_Controller
                         'fule_group' => $this->input->post('fule_group'),
                         'delivery_rate_group' => $this->input->post('delivery_rate_group')
                     );
-                            echo '<pre>'; print_r($d);exit;
+                            // echo '<pre>'; print_r($d);exit;
                   
                     $result = $this->basic_operation_m->insert('franchise_delivery_tbl', $d);
-                    print_r($result);exit;
+                    // print_r($result);exit;
                 
                 if (!empty($result)) {
                     $msg            = 'Franchise added successfully';

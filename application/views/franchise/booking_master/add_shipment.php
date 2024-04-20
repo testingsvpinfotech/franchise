@@ -552,7 +552,7 @@
                                                  <label class="col-sm-12 col-form-label" id="rate_display"></label>
                                                 <div class="col-sm-3">
                                                     <!-- Charges   -->
-                                                    <input type="hidden" name="frieht" min="1" class="form-control" value="" required  id="frieht1" readonly>
+                                                    <input type="hidden" name="frieht1" min="1" class="form-control" value="" required  id="frieht1" readonly>
                                                     <input type="hidden" name="delivery_charges1" class="form-control" value="0" id="delivery_charges1" readonly>
                                                     <input type="hidden" name="courier_charges1" class="form-control" value="0" id="courier_charges1" readonly>
                                                     <input type="hidden" name="other_charges1" class="form-control" value="0" id="other_charges1" readonly>
