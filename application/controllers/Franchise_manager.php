@@ -485,11 +485,12 @@ class Franchise_manager extends CI_Controller
 			// echo '<pre>'; print_r($_POST);exit;
 			if($_SESSION['franchise_type']== 1 || $_SESSION['franchise_type'] ==3){
                  if(!empty($all_Data['customer_id']) && $all_Data['company_customer']==1){
+					// echo '<pre>'; print_r($_POST);exit;
 					$this->CustomerBNF_insert($all_Data);
 					exit();
 				 }
 			}
-		    // print_r($_POST);die;
+		  
 		 
 			$user_type = $this->session->userdata("customer_type");
 			$balance = $this->db->query("Select * from tbl_customers where customer_id = '$user_id'")->row();
@@ -739,7 +740,7 @@ class Franchise_manager extends CI_Controller
 									$franchise_id = 'BFT1000' . $id;
 								}
 								if($this->input->post('dispatch_details')!='TOPAY'){
-									if ($this->input->post('grand_total') != '') {
+									if ($this->input->post('grand_total') != ''){
 										$value = $this->session->userdata('customer_id');
 										$g_total = $this->input->post('grand_total');
 										$balance = $this->db->query("Select * from tbl_franchise where fid = '$value'")->row();
@@ -3047,13 +3048,15 @@ class Franchise_manager extends CI_Controller
 				
 				if(!empty($commision_master)){
 					 $booking_commsion = $commision_master->booking_commission;
+					//  print_r($frieht);die;
 					 $delivery_commission = $commision_master->delivery_commission;
-					 $booking_charges =  ($frieht * $booking_commsion / 100);
-					 $delivery_charges =  ($frieht * $delivery_commission / 100);
+					//  $booking_charges =  ($frieht * $booking_commsion / 100);
+					 $booking_charges =  ($frieht / 100 * $booking_commsion);
+					 $delivery_charges =  ($frieht / 100  * $delivery_commission);
 					
 					 if($door_delivery=='1'){
 						$door_delivery_share = $commision_master->door_delivery_share;
-						$door_delivery_charges =  ($frieht * $door_delivery_share / 100);
+						$door_delivery_charges =  ($frieht/ 100 * $door_delivery_share);
 					 }else{
 						$door_delivery_share =0;
 						$door_delivery_charges =  0.00;
@@ -3366,12 +3369,12 @@ class Franchise_manager extends CI_Controller
 			if(!empty($commision_master)){
 				 $booking_commsion = $commision_master->booking_commission;
 				 $delivery_commission = $commision_master->delivery_commission;
-				 $booking_charges =  ($frieht * $booking_commsion / 100);
-				 $delivery_charges =  ($frieht * $delivery_commission / 100);
+				 $booking_charges =  ($frieht / 100 * $booking_commsion);
+				 $delivery_charges =  ($frieht / 100* $delivery_commission );
 				
 				 if($door_delivery=='1'){
 					$door_delivery_share = $commision_master->door_delivery_share;
-					$door_delivery_charges =  ($frieht * $door_delivery_share / 100);
+					$door_delivery_charges =  ($frieht / 100 * $door_delivery_share);
 				 }else{
 					$door_delivery_share =0;
 					$door_delivery_charges =  0.00;
